@@ -107,5 +107,18 @@ pub mod bits {
 
         bits
     }
-}
 
+    fn int_to_bits(num: u32) -> String {
+        let mut bits = String::new();
+
+        for i in (0..32).rev() {
+            if num & (1 << i) != 0 {
+                bits.push('1');
+            } else {
+                bits.push('0');
+            }
+        }
+
+        bits
+    }
+}
