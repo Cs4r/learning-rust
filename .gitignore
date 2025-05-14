@@ -1,0 +1,38 @@
+# === Rust & Cargo ===
+/target/
+**/*.rs.bk
+
+# Uncomment the next line if you're building a library, not a binary
+# Cargo.lock
+
+# === macOS System Files ===
+.DS_Store
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+Icon?
+._*
+
+# === JetBrains IDEs (RustRover, CLion, IntelliJ) ===
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# === Editor swap/backup files ===
+*~
+*.swp
+*.swo
+
+# === Logs and dumps ===
+*.log
+*.stackdump
+*.dSYM/
+
+# === Native build artifacts ===
+*.o
+*.so
+*.dll
+*.dylib
