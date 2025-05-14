@@ -22,7 +22,8 @@ pub mod parity {
             let mut counter = 0;
 
             for i in (0..8).rev() {
-                if self.byte & (1 << i) != 0 {  // If the i-th bit of byte is 1
+                if self.byte & (1 << i) != 0 {
+                    // If the i-th bit of byte is 1
                     counter += 1;
                 }
             }
@@ -76,3 +77,35 @@ pub mod parity {
         }
     }
 }
+
+pub mod bits {
+
+    pub fn str_to_bits(input: &str) -> String {
+        let mut bytes = String::new();
+
+        for (i, c) in input.chars().enumerate() {
+            let byte = char_to_bits(c as u8);
+            bytes.push_str(&byte);
+            if i != input.len() - 1 {
+                bytes.push(' ');
+            }
+        }
+
+        bytes
+    }
+
+    fn char_to_bits(byte: u8) -> String {
+        let mut bits = String::new();
+
+        for i in (0..8).rev() {
+            if byte & (1 << i) != 0 {
+                bits.push('1');
+            } else {
+                bits.push('0');
+            }
+        }
+
+        bits
+    }
+}
+
