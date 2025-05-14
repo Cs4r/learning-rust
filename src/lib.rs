@@ -46,7 +46,6 @@ pub mod parity {
         odds % 2 == 1
     }
 
-    // Tests for the parity function
     #[cfg(test)]
     mod tests {
         use super::*;

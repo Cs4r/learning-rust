@@ -4,7 +4,7 @@ version = "0.0.1"
 edition = "2024"
 
 [[bin]]
-name = "main1"
-path = "bin/main1.rs"
+name = "parity_test"
+path = "bin/parity_test.rs"
 
 [dependencies]
