@@ -45,4 +45,35 @@ pub mod parity {
 
         odds % 2 == 1
     }
+
+    // Tests for the parity function
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+
+        #[test]
+        fn test_parity_even() {
+            assert_eq!(parity("zxcv"), false);
+            assert_eq!(parity("cesar"), false);
+            assert_eq!(parity("luis"), false);
+        }
+
+        #[test]
+        fn test_parity_odd() {
+            assert_eq!(parity("1234"), true);
+            assert_eq!(parity("abcd"), true);
+            assert_eq!(parity("mari"), true);
+        }
+
+        #[test]
+        fn test_parity_empty() {
+            assert_eq!(parity(""), false);
+        }
+
+        #[test]
+        fn test_parity_single_char() {
+            assert_eq!(parity("a"), true);
+            assert_eq!(parity("b"), true);
+        }
+    }
 }
