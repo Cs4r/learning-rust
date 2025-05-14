@@ -1,4 +1,7 @@
+pub mod parity {
 
-pub fn greeting() {
-    println!("Hello, world!");
+    pub struct Parity {
+        byte: u8,
+        bit: bool,
+    }
 }
