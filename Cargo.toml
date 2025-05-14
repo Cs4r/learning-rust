@@ -7,4 +7,8 @@ edition = "2024"
 name = "parity_test"
 path = "bin/parity_test.rs"
 
+[[bin]]
+name = "bits_test"
+path = "bin/bits_test.rs"
+
 [dependencies]

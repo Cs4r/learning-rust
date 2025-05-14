@@ -1,3 +1,5 @@
+mod bits_test;
+
 use learning_rust::parity::parity;
 use std::{env, io};
 
