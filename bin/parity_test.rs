@@ -16,7 +16,7 @@ fn main() {
             .read_line(&mut input)
             .expect("Failed to read line");
 
-        &(input.to_owned())
+        &(input.trim().to_owned())
     };
 
     print_parity(input);
