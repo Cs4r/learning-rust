@@ -8,7 +8,7 @@ impl BitVector {
     pub fn new() -> Self {
         Self::with_bits(0)
     }
-    
+
     fn with_bits(n_bits: usize) -> BitVector {
         if n_bits == 0 {
             BitVector {
@@ -49,6 +49,14 @@ mod tests {
     #[test]
     fn test_new_creates_empty_vector() {
         let bv = BitVector::new();
+        assert_eq!(bv.n_bits(), 0);
+        assert_eq!(bv.n_bytes(), 0);
+        assert!(bv.data.is_empty());
+    }
+    
+    #[test]
+    fn test_with_bits_zero_creates_empty_vector() {
+        let bv = BitVector::with_bits(0);
         assert_eq!(bv.n_bits(), 0);
         assert_eq!(bv.n_bytes(), 0);
         assert!(bv.data.is_empty());
