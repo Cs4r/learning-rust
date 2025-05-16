@@ -234,4 +234,15 @@ mod tests {
         assert_ne!(bv1, bv2);
     }
 
+    #[test]
+    fn neq_different_data() {
+        let mut bv1 = BitVector::with_bits(8);
+        let mut bv2 = BitVector::with_bits(8);
+
+        bv1.data[0] = 0b0000_0001;
+        bv2.data[0] = 0b0000_0010;
+
+        assert_ne!(bv1, bv2);
+    }
+
 }
