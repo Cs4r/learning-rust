@@ -53,6 +53,21 @@ Or interactively:
 cargo run --bin lrc_test
 ```
 
+### 4. `crc32_test`
+
+Computes the CRC32 (Cyclic Redundancy Check) checksum of the input bytes.
+
+##### ✅ Usage
+
+```bash
+    cargo run --bin crc32_test "Your input text"
+```
+
+Or interactively:
+
+```bash
+cargo run --bin crc32_test
+```
 
 ## 🛠 Requirements
 
