@@ -157,4 +157,16 @@ mod tests {
         assert_eq!(bv.data[0], 0b00000000);
         assert_eq!(bv.data[1], 0b10000000);
     }
+
+    #[test]
+    fn test_add_assign_multiple_resizes() {
+        let mut bv = BitVector::new();
+        for i in 0..100 {
+            bv += i % 2 == 0;
+        }
+        assert_eq!(bv.n_bits(), 100);
+        assert!(bv.data.len() > 13);
+        assert_eq!(bv.data[0], 0b10101010);
+        assert_eq!(bv.data[12], 0b10100000);
+    }
 }
