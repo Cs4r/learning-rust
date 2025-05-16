@@ -60,8 +60,20 @@ impl PartialEq for BitVector {
             return false;
         }
 
-        for i in 0..self.n_bytes() {
-            if self.data[i] != other.data[i] {
+        let full_bytes = self.n_bits / 8;
+        let leftover_bits = self.n_bits % 8;
+
+        // Compare full bytes
+        if self.data[..full_bytes] != other.data[..full_bytes] {
+            return false;
+        }
+
+        // If there are leftover bits, compare those with a mask
+        if leftover_bits > 0 {
+            let mask = (1 << leftover_bits) - 1;
+            let self_last = self.data[full_bytes] & mask;
+            let other_last = other.data[full_bytes] & mask;
+            if self_last != other_last {
                 return false;
             }
         }
@@ -241,6 +253,60 @@ mod tests {
 
         bv1.data[0] = 0b0000_0001;
         bv2.data[0] = 0b0000_0010;
+
+        assert_ne!(bv1, bv2);
+    }
+
+    #[test]
+    fn test_equal_with_unused_bits_ignored() {
+        // 10 bits = 1 full byte + 2 bits in next byte
+        let mut bv1 = BitVector::with_bits(10);
+        let mut bv2 = BitVector::with_bits(10);
+
+        // Set same bits in both
+        bv1.data[0] = 0b10101010;
+        bv2.data[0] = 0b10101010;
+
+        bv1.data[1] = 0b00000011; // only lower 2 bits used
+        bv2.data[1] = 0b11111111; // bits beyond 2nd bit differ, but ignored
+
+        assert_eq!(bv1, bv2);
+    }
+
+    #[test]
+    fn test_not_equal_due_to_used_bits_difference() {
+        // 10 bits again
+        let mut bv1 = BitVector::with_bits(10);
+        let mut bv2 = BitVector::with_bits(10);
+
+        bv1.data[0] = 0b10101010;
+        bv2.data[0] = 0b10101010;
+
+        bv1.data[1] = 0b00000011;
+        bv2.data[1] = 0b00000010; // difference in the 2nd bit (used bit)
+
+        assert_ne!(bv1, bv2);
+    }
+
+
+    #[test]
+    fn test_equal_full_bytes() {
+        let mut bv1 = BitVector::with_bits(16);
+        let mut bv2 = BitVector::with_bits(16);
+
+        bv1.data[0] = 0xFF;
+        bv1.data[1] = 0xAA;
+
+        bv2.data[0] = 0xFF;
+        bv2.data[1] = 0xAA;
+
+        assert_eq!(bv1, bv2);
+    }
+
+    #[test]
+    fn test_not_equal_different_sizes() {
+        let bv1 = BitVector::with_bits(8);
+        let bv2 = BitVector::with_bits(9);
 
         assert_ne!(bv1, bv2);
     }
