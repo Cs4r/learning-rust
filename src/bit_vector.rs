@@ -1,3 +1,5 @@
+use std::ops::AddAssign;
+
 pub struct BitVector {
     data: Vec<u8>,
     n_bits: usize,
@@ -28,6 +30,25 @@ impl BitVector {
 
     pub fn n_bytes(&self) -> usize {
         n_bytes(self.n_bits)
+    }
+}
+
+impl AddAssign<bool> for BitVector {
+    fn add_assign(&mut self, x: bool) {
+
+        if 8 * self.data.len() == self.n_bits {
+            let new_len = if self.data.len() == 0 { 1 } else { self.data.len() * 2 };
+            self.data.resize(new_len, 0);
+        }
+
+        self.n_bits += 1;
+
+        let shift = 8 * self.n_bytes() - self.n_bits();
+        let byte = self.n_bytes() - 1;
+
+        if x {
+            self.data[byte] |= 1 << shift;
+        }
     }
 }
 
