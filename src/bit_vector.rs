@@ -169,4 +169,15 @@ mod tests {
         assert_eq!(bv.data[0], 0b10101010);
         assert_eq!(bv.data[12], 0b10100000);
     }
+
+    #[test]
+    fn test_add_assign_only_false() {
+        let mut bv = BitVector::new();
+        for _ in 0..16 {
+            bv += false;
+        }
+        assert_eq!(bv.n_bits(), 16);
+        assert_eq!(bv.data, vec![0b00000000, 0b00000000]);
+    }
+
 }
