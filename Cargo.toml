@@ -11,4 +11,12 @@ path = "bin/parity_test.rs"
 name = "bits_test"
 path = "bin/bits_test.rs"
 
+[[bin]]
+name = "lrc_test"
+path = "bin/lrc_test.rs"
+
+[[bin]]
+name = "crc32_test"
+path = "bin/crc32_test.rs"
+
 [dependencies]
