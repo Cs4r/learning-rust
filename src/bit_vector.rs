@@ -4,6 +4,10 @@ struct BitVector {
 }
 
 impl BitVector {
+    pub fn empty() -> BitVector {
+        Self::new(0)
+    }
+
     pub fn new(n_bits: u64) -> BitVector {
         if n_bits == 0 {
             BitVector {
