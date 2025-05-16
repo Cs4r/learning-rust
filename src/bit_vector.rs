@@ -37,10 +37,21 @@ impl BitVector {
     pub fn get(&self, bit_n: usize) -> bool {
         assert!(bit_n < self.n_bits, "Index out of bounds");
 
-        let byte_index = bit_n >> 3;
-        let bit_mask = 1 << (bit_n & 7);
+        let byte_index = byte_index(bit_n);
+        let bit_mask = mask(bit_n);
 
         (self.data[byte_index] & bit_mask) != 0
+    }
+
+    pub fn set(&mut self, bit_n: usize, value: bool) {
+        let byte_index = byte_index(bit_n);
+        let bit_mask = mask(bit_n);
+
+        if value {
+            self.data[byte_index] |= bit_mask;
+        } else {
+            self.data[byte_index] &= !bit_mask;
+        }
     }
 }
 
@@ -95,6 +106,14 @@ impl Eq for BitVector {}
 
 fn n_bytes(n_bits: usize) -> usize {
     (n_bits + 7) >> 3
+}
+
+fn byte_index(bit_n: usize) -> usize {
+    bit_n >> 3
+}
+
+fn mask(bit_n: usize) -> u8 {
+    1 << (bit_n & 7)
 }
 
 #[cfg(test)]
@@ -331,7 +350,7 @@ mod tests {
     #[test]
     fn test_get_single_bit_set() {
         let mut bv = BitVector::with_bits(8);
-        
+
         for i in 0..8 {
             assert_eq!(bv.get(i), false);
         }
@@ -339,7 +358,7 @@ mod tests {
         // Set bit 3 manually
         bv.data[0] |= 1 << 3;
         assert_eq!(bv.get(3), true);
-       
+
         // Other bits remain false
         for i in 0..8 {
             if i != 3 {
