@@ -110,4 +110,13 @@ mod tests {
         assert_eq!(bv.n_bytes(), 1);
         assert_eq!(bv.data[0], 0b10000000);
     }
+
+    #[test]
+    fn test_add_assign_false_to_empty_vector() {
+        let mut bv = BitVector::new();
+        bv += false;
+        assert_eq!(bv.n_bits(), 1);
+        assert_eq!(bv.n_bytes(), 1);
+        assert_eq!(bv.data[0], 0b00000000);
+    }
 }
