@@ -44,10 +44,10 @@ impl AddAssign<bool> for BitVector {
         self.n_bits += 1;
 
         let shift = 8 * self.n_bytes() - self.n_bits();
-        let byte = self.n_bytes() - 1;
+        let last_byte = self.n_bytes() - 1;
 
         if x {
-            self.data[byte] |= 1 << shift;
+            self.data[last_byte] |= 1 << shift;
         }
     }
 }
