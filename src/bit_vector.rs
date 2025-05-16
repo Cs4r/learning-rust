@@ -15,7 +15,7 @@ impl BitVector {
                 n_bits: 0,
             }
         } else {
-            let n_bytes = Self::n_bytes(n_bits);
+            let n_bytes = n_bytes(n_bits);
             let vec : Vec<u8> =  vec![0; n_bytes as usize];
             
             BitVector {
@@ -25,9 +25,16 @@ impl BitVector {
         }
     }
 
-    fn n_bytes(n_bits: u64) -> u64 {
-        (n_bits + 7) >> 3
+    pub fn n_bits(&self) -> u64 {
+        self.n_bits
     }
+
+    pub fn n_bytes(&self) -> u64 {
+        n_bytes(self.n_bits)
+    }
+
 }
 
-
+fn n_bytes(n_bits: u64) -> u64 {
+    (n_bits + 7) >> 3
+}
