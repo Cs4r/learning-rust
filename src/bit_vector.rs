@@ -35,6 +35,12 @@ impl BitVector {
 
 }
 
+impl Default for BitVector {
+    fn default() -> Self {
+        Self::new(0)
+    }
+}
+
 fn n_bytes(n_bits: u64) -> u64 {
     (n_bits + 7) >> 3
 }
