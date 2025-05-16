@@ -33,6 +33,15 @@ impl BitVector {
     pub fn n_bytes(&self) -> usize {
         n_bytes(self.n_bits)
     }
+
+    pub fn get(&self, bit_n: usize) -> bool {
+        assert!(bit_n < self.n_bits, "Index out of bounds");
+        
+        let byte_index = bit_n >> 3;
+        let bit_mask = 1 << (bit_n & 7);
+
+        (self.data[byte_index] & bit_mask) != 0
+    }
 }
 
 impl AddAssign<bool> for BitVector {
