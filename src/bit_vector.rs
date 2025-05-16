@@ -216,4 +216,22 @@ mod tests {
         let bv2 = BitVector::new();
         assert_eq!(bv1, bv2);
     }
+
+
+    #[test]
+    fn eq_same_content() {
+        let bv1 = BitVector::with_bits(10);
+        let bv2 = BitVector::with_bits(10);
+
+        assert_eq!(bv1, bv2);
+    }
+
+
+    #[test]
+    fn neq_different_n_bits() {
+        let bv1 = BitVector::with_bits(5);
+        let bv2 = BitVector::with_bits(10);
+        assert_ne!(bv1, bv2);
+    }
+
 }
