@@ -131,4 +131,30 @@ mod tests {
         assert_eq!(bv.data.len(), 1);
         assert_eq!(bv.data[0], 0b10100000);
     }
+
+    #[test]
+    fn test_add_assign_fill_one_byte() {
+        let mut bv = BitVector::new();
+        for _ in 0..8 {
+            bv += true;
+        }
+        assert_eq!(bv.n_bits(), 8);
+        assert_eq!(bv.data.len(), 1);
+        assert_eq!(bv.data[0], 0b11111111);
+    }
+
+
+    #[test]
+    fn test_add_assign_triggers_resize() {
+        let mut bv = BitVector::new();
+        for _ in 0..8 {
+            bv += false;
+        }
+        assert_eq!(bv.data.len(), 1);
+        bv += true; // 9th bit, triggers resize
+        assert_eq!(bv.n_bits(), 9);
+        assert_eq!(bv.data.len(), 2);
+        assert_eq!(bv.data[0], 0b00000000);
+        assert_eq!(bv.data[1], 0b10000000);
+    }
 }
