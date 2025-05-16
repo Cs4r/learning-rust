@@ -36,7 +36,7 @@ impl BitVector {
 
     pub fn get(&self, bit_n: usize) -> bool {
         assert!(bit_n < self.n_bits, "Index out of bounds");
-        
+
         let byte_index = bit_n >> 3;
         let bit_mask = 1 << (bit_n & 7);
 
@@ -318,6 +318,59 @@ mod tests {
         let bv2 = BitVector::with_bits(9);
 
         assert_ne!(bv1, bv2);
+    }
+
+    #[test]
+    fn test_get_empty_vector() {
+        let bv = BitVector::new();
+        // Accessing any bit should panic because n_bits == 0
+        let result = std::panic::catch_unwind(|| bv.get(0));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_get_single_bit_set() {
+        let mut bv = BitVector::with_bits(8);
+        
+        for i in 0..8 {
+            assert_eq!(bv.get(i), false);
+        }
+
+        // Set bit 3 manually
+        bv.data[0] |= 1 << 3;
+        assert_eq!(bv.get(3), true);
+       
+        // Other bits remain false
+        for i in 0..8 {
+            if i != 3 {
+                assert_eq!(bv.get(i), false);
+            }
+        }
+    }
+
+    #[test]
+    fn test_get_multiple_bytes() {
+        // Create a BitVector with 16 bits (2 bytes)
+        let mut bv = BitVector::with_bits(16);
+        // Set bit 0 and bit 15
+        bv.data[0] |= 1 << 0;   // First bit of first byte
+        bv.data[1] |= 1 << 7;   // Last bit of second byte (bit 15)
+
+        assert_eq!(bv.get(0), true);
+        assert_eq!(bv.get(15), true);
+
+        // Check some bits that should be false
+        for i in 1..15 {
+            assert_eq!(bv.get(i), false);
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "Index out of bounds")]
+    fn test_get_out_of_bounds() {
+        let bv = BitVector::with_bits(8);
+        // Accessing bit beyond n_bits should panic
+        bv.get(8);
     }
 
 }
