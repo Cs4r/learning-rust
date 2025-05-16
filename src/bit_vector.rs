@@ -1,42 +1,41 @@
-struct BitVector {
-    bits: Vec<u8>,
-    n_bits: u64,
+pub struct BitVector {
+    data: Vec<u8>,
+    n_bits: usize,
 }
 
 impl BitVector {
-    pub fn new(n_bits: u64) -> BitVector {
+
+    pub fn new() -> Self {
+        Self::with_bits(0)
+    }
+    
+    fn with_bits(n_bits: usize) -> BitVector {
         if n_bits == 0 {
             BitVector {
-                bits: vec![],
+                data: vec![],
                 n_bits: 0,
             }
         } else {
             let n_bytes = n_bytes(n_bits);
-            let vec : Vec<u8> =  vec![0; n_bytes as usize];
+            let vec : Vec<u8> =  vec![0; n_bytes];
             
             BitVector {
-                bits: vec,
+                data: vec,
                 n_bits,
             }
         }
     }
 
-    pub fn n_bits(&self) -> u64 {
+    pub fn n_bits(&self) -> usize {
         self.n_bits
     }
 
-    pub fn n_bytes(&self) -> u64 {
+    pub fn n_bytes(&self) -> usize {
         n_bytes(self.n_bits)
     }
 
 }
 
-impl Default for BitVector {
-    fn default() -> Self {
-        Self::new(0)
-    }
-}
-
-fn n_bytes(n_bits: u64) -> u64 {
+fn n_bytes(n_bits: usize) -> usize {
     (n_bits + 7) >> 3
 }
