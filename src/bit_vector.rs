@@ -346,6 +346,17 @@ mod tests {
 
             assert_ne!(bv1, bv2);
         }
+
+        #[test]
+        fn test_eq_zero_bits_nonempty_data() {
+            let mut bv1 = BitVector::with_bits(0);
+            let mut bv2 = BitVector::with_bits(0);
+
+            bv1.data = vec![0b10101010];
+            bv2.data = vec![0b11110000];
+
+            assert_eq!(bv1, bv2);
+        }
     }
 
     mod get_set {
