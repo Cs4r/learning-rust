@@ -209,4 +209,11 @@ mod tests {
         assert_eq!(bv.n_bits(), 16);
         assert_eq!(bv.data, vec![0b11111111, 0b11111111]);
     }
+
+    #[test]
+    fn eq_same_empty_vectors() {
+        let bv1 = BitVector::new();
+        let bv2 = BitVector::new();
+        assert_eq!(bv1, bv2);
+    }
 }
