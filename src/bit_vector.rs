@@ -392,4 +392,43 @@ mod tests {
         bv.get(8);
     }
 
+    #[test]
+    fn test_set_bit_true() {
+        let mut bv = BitVector::with_bits(16);
+        bv.set(3, true);
+        assert!(bv.get(3)); // bit 3 should be set
+        // Check other bits are still false
+        assert!(!bv.get(0));
+        assert!(!bv.get(15));
+    }
+
+    #[test]
+    fn test_set_bit_false() {
+        let mut bv = BitVector::with_bits(16);
+        bv.set(5, true);
+        assert!(bv.get(5));
+        bv.set(5, false);
+        assert!(!bv.get(5)); // bit 5 should be cleared
+    }
+
+    #[test]
+    fn test_set_multiple_bits() {
+        let mut bv = BitVector::with_bits(10);
+        bv.set(0, true);
+        bv.set(9, true);
+        assert!(bv.get(0));
+        assert!(bv.get(9));
+        // bits in between should be false
+        for i in 1..9 {
+            assert!(!bv.get(i));
+        }
+    }
+
+    #[test]
+    #[should_panic] // If your BitVector does not handle out-of-bounds gracefully
+    fn test_set_out_of_bounds() {
+        let mut bv = BitVector::with_bits(8);
+        bv.set(10, true); // Should panic or handle error
+    }
+
 }
