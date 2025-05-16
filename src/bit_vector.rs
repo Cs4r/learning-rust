@@ -1,5 +1,7 @@
-use std::ops::AddAssign;
+use std::ops::{Add, AddAssign};
 
+
+#[derive(Debug)]
 pub struct BitVector {
     data: Vec<u8>,
     n_bits: usize,
@@ -51,6 +53,24 @@ impl AddAssign<bool> for BitVector {
         }
     }
 }
+
+impl PartialEq for BitVector {
+    fn eq(&self, other: &Self) -> bool {
+        if self.n_bits != other.n_bits {
+            return false;
+        }
+
+        for i in 0..self.n_bytes() {
+            if self.data[i] != other.data[i] {
+                return false;
+            }
+        }
+
+        true
+    }
+}
+
+impl Eq for BitVector {}
 
 fn n_bytes(n_bits: usize) -> usize {
     (n_bits + 7) >> 3
@@ -179,7 +199,7 @@ mod tests {
         assert_eq!(bv.n_bits(), 16);
         assert_eq!(bv.data, vec![0b00000000, 0b00000000]);
     }
-    
+
     #[test]
     fn test_add_assign_only_true() {
         let mut bv = BitVector::new();
