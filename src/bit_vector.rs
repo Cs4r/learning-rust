@@ -4,7 +4,6 @@ pub struct BitVector {
 }
 
 impl BitVector {
-
     pub fn new() -> Self {
         Self::with_bits(0)
     }
@@ -17,12 +16,9 @@ impl BitVector {
             }
         } else {
             let n_bytes = n_bytes(n_bits);
-            let vec : Vec<u8> =  vec![0; n_bytes];
-            
-            BitVector {
-                data: vec,
-                n_bits,
-            }
+            let vec: Vec<u8> = vec![0; n_bytes];
+
+            BitVector { data: vec, n_bits }
         }
     }
 
@@ -33,14 +29,11 @@ impl BitVector {
     pub fn n_bytes(&self) -> usize {
         n_bytes(self.n_bits)
     }
-
 }
 
 fn n_bytes(n_bits: usize) -> usize {
     (n_bits + 7) >> 3
 }
-
-
 
 #[cfg(test)]
 mod tests {
@@ -53,7 +46,7 @@ mod tests {
         assert_eq!(bv.n_bytes(), 0);
         assert!(bv.data.is_empty());
     }
-    
+
     #[test]
     fn test_with_bits_zero_creates_empty_vector() {
         let bv = BitVector::with_bits(0);
@@ -62,4 +55,16 @@ mod tests {
         assert!(bv.data.is_empty());
     }
 
+    #[test]
+    fn test_with_bits_nonzero_creates_correct_size() {
+        let bits = 13;
+        let bv = BitVector::with_bits(bits);
+        assert_eq!(bv.n_bits(), bits);
+
+        let expected_bytes = n_bytes(bits);
+        assert_eq!(bv.n_bytes(), expected_bytes);
+        assert_eq!(bv.data.len(), expected_bytes);
+
+        assert!(bv.data.iter().all(|&b| b == 0));
+    }
 }
