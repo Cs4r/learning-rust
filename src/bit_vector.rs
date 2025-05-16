@@ -40,6 +40,18 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_n_bytes_calculation() {
+        assert_eq!(n_bytes(0), 0);
+        assert_eq!(n_bytes(1), 1);
+        assert_eq!(n_bytes(7), 1);
+        assert_eq!(n_bytes(8), 1);
+        assert_eq!(n_bytes(9), 2);
+        assert_eq!(n_bytes(15), 2);
+        assert_eq!(n_bytes(16), 2);
+        assert_eq!(n_bytes(17), 3);
+    }
+
+    #[test]
     fn test_new_creates_empty_vector() {
         let bv = BitVector::new();
         assert_eq!(bv.n_bits(), 0);
