@@ -39,3 +39,19 @@ impl BitVector {
 fn n_bytes(n_bits: usize) -> usize {
     (n_bits + 7) >> 3
 }
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new_creates_empty_vector() {
+        let bv = BitVector::new();
+        assert_eq!(bv.n_bits(), 0);
+        assert_eq!(bv.n_bytes(), 0);
+        assert!(bv.data.is_empty());
+    }
+
+}
