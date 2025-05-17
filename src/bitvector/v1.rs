@@ -68,6 +68,11 @@ impl BitVector {
             self.data[last_byte] ^= 1 << shift;
         }
     }
+
+    pub fn clear(&mut self) {
+        self.n_bits = 0;
+        self.data.clear();
+    }
 }
 
 impl PartialEq for BitVector {
@@ -558,6 +563,20 @@ mod tests {
 
             let reconstructed = format!("{}", &bv);
             assert_eq!(reconstructed, "11010");
+        }
+    }
+
+    mod clear_behavior {
+        use super::*;
+
+        #[test]
+        fn clear_vector() {
+            let mut bv :BitVector = "10101".parse().unwrap();
+
+            bv.clear();
+
+            assert_eq!(bv.n_bits(), 0);
+            assert_eq!(bv.data.len(), 0);
         }
     }
 
