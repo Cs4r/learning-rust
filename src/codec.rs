@@ -21,7 +21,7 @@ impl Codec {
         self.by_byte.insert(byte, shared);
     }
 
-    pub fn is_byte_enconded(&self, byte: u8) -> bool {
+    pub fn is_byte_encoded(&self, byte: u8) -> bool {
         self.by_byte.contains_key(&byte)
     }
 }
@@ -90,10 +90,10 @@ mod tests {
         use super::*;
 
         #[test]
-        fn returns_false_when_byte_not_registered() {
+        fn returns_false_on_empty_codec() {
             let empty_codec = Codec::new();
 
-            assert!(!empty_codec.is_byte_enconded(4));
+            assert!(!empty_codec.is_byte_encoded(4));
         }
 
         #[test]
@@ -102,11 +102,47 @@ mod tests {
 
             let byte = 55;
             codec.register_code(byte, BitVector::new());
-            
-            assert!(codec.is_byte_enconded(byte));
+
+            assert!(codec.is_byte_encoded(byte));
         }
 
+        #[test]
+        fn returns_false_when_byte_not_registered()  {
+            let mut codec = Codec::new();
 
+            let byte = 55;
+            codec.register_code(byte, BitVector::new());
+
+            assert!(!codec.is_byte_encoded(byte + 1));
+        }
+
+        #[test]
+        fn returns_true_for_multiple_registered_bytes() {
+            let mut codec = Codec::new();
+
+            for byte in 0..10 {
+                let bv: BitVector = if byte % 2 == 0 { "1".parse().unwrap() } else { "0".parse().unwrap() };
+                codec.register_code(byte, bv);
+            }
+
+            for byte in 0..10 {
+                assert!(codec.is_byte_encoded(byte));
+            }
+        }
+
+        #[test]
+        fn returns_false_for_unregistered_byte_among_registered_ones() {
+            let mut codec = Codec::new();
+
+            for byte in 0..10 {
+                let bv: BitVector = "1".parse().unwrap();
+                codec.register_code(byte, bv);
+            }
+
+            let unregistered_byte = 100;
+
+            assert!(!codec.is_byte_encoded(unregistered_byte));
+        }
 
     }
 }
