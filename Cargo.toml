@@ -27,4 +27,8 @@ path = "bin/encode.rs"
 name = "decode"
 path = "bin/decode.rs"
 
+[[bin]]
+name = "lz77"
+path = "bin/lz77.rs"
+
 [dependencies]
