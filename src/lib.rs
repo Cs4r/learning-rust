@@ -5,3 +5,4 @@ pub mod utils;
 pub mod crc32;
 pub mod bitvector;
 pub mod codec;
+pub mod LzCoder;
