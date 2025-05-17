@@ -115,6 +115,29 @@ Lines without a character (just a space followed by bits) are used to encode the
 
 The program prints the encoded bitstream (as a sequence of '0' and '1' characters) to stdout.
 
+### 6. `decode`
+
+Reads a file containing a Huffman-encoded bitstream (as ASCII '0' and '1' characters), decodes it using a given Huffman codec, and prints the decoded text to standard output.
+
+##### 📥 Input file format
+
+- The codec file must follow the format described in the encode program (first line is the number of elements, then each line contains a character and its Huffman code).
+- The encoded file should contain a sequence of ASCII characters '0' and '1' representing the Huffman-encoded bitstream.
+
+##### ✅ Usage
+
+Run the program providing the codec file and the encoded input file:
+
+```bash
+   cargo run --bin decode -- <codec_file> <encoded_file> > decoded.txt
+```
+
+Example:
+
+```bash
+   cargo run --bin decode -- assets/huffman_ascii_es.txt assets/encoded.txt > decoded.txt
+```
+
 ## 🛠 Requirements
 
 - Rust (edition 2024)
