@@ -1,4 +1,5 @@
 use std::fmt::Display;
+use std::str::FromStr;
 
 #[derive(Debug, Hash, Eq)]
 pub struct BitVector {
@@ -23,6 +24,20 @@ impl BitVector {
 
             BitVector { data: vec, n_bits }
         }
+    }
+
+    pub fn from_str(s: &str) -> Result<Self, String> {
+        let mut bv = BitVector::new();
+
+        for (i, c) in s.chars().enumerate() {
+            match c {
+                '0' => bv.add_bit(false),
+                '1' => bv.add_bit(true),
+                other => return Err(format!("Invalid character '{}' at position {}", other, i)),
+            }
+        }
+
+        Ok(bv)
     }
 
     pub fn n_bits(&self) -> usize {
@@ -70,10 +85,6 @@ impl PartialEq for BitVector {
     }
 }
 
-fn n_bytes(n_bits: usize) -> usize {
-    (n_bits + 7) >> 3
-}
-
 impl Display for BitVector {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         if self.n_bits == 0 {
@@ -99,6 +110,18 @@ impl Display for BitVector {
 
         Ok(())
     }
+}
+
+impl FromStr for BitVector {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        BitVector::from_str(s)
+    }
+}
+
+fn n_bytes(n_bits: usize) -> usize {
+    (n_bits + 7) >> 3
 }
 
 #[cfg(test)]
@@ -451,4 +474,52 @@ mod tests {
             assert_eq!(output, "101010101100");
         }
     }
+
+    mod from_str_behavior {
+        use std::fmt::format;
+        use super::*;
+
+        #[test]
+        fn parses_binary_string_correctly() {
+            let bv = BitVector::from_str("10101").unwrap();
+            assert_eq!(bv.n_bits(), 5);
+
+            let bit_string = format!("{}", &bv);
+            assert_eq!(bit_string, "10101");
+        }
+
+        #[test]
+        fn handles_empty_string() {
+            let bv = BitVector::from_str("").unwrap();
+            assert_eq!(bv.n_bits(), 0);
+            assert_eq!(bv.n_bytes(), 0);
+        }
+
+        #[test]
+        fn fails_on_invalid_character() {
+            let err = BitVector::from_str("10a01").unwrap_err();
+            assert_eq!(err, "Invalid character 'a' at position 2");
+        }
+
+        #[test]
+        fn parses_long_binary_string() {
+            let input = "1100101001110001110101010101010111101"; // 37 bits
+            let bv = BitVector::from_str(input).unwrap();
+            assert_eq!(bv.n_bits(), input.len());
+
+            let reconstructed = format!("{}", &bv);
+            assert_eq!(reconstructed, input);
+        }
+
+        #[test]
+        fn parses_using_parse_method() {
+            let bv: BitVector = "11010".parse().unwrap();
+            assert_eq!(bv.n_bits(), 5);
+
+            let reconstructed = format!("{}", &bv);
+            assert_eq!(reconstructed, "11010");
+        }
+    }
+
+
 }
