@@ -24,6 +24,10 @@ impl Codec {
     pub fn is_byte_encoded(&self, byte: u8) -> bool {
         self.by_byte.contains_key(&byte)
     }
+
+    pub fn is_bitvector_encoded(&self, bit_vector: &BitVector) -> bool {
+        self.by_vector.contains_key(bit_vector)
+    }
 }
 
 #[cfg(test)]
@@ -144,5 +148,64 @@ mod tests {
             assert!(!codec.is_byte_encoded(unregistered_byte));
         }
 
+    }
+
+    mod is_bitvector_encoded_behavior {
+        use super::*;
+
+        #[test]
+        fn returns_false_when_map_is_empty() {
+            let codec = Codec::new();
+
+            let bv: BitVector = "1".parse().unwrap();
+
+            assert!(!codec.is_bitvector_encoded(&bv));
+        }
+
+        #[test]
+        fn returns_true_after_registering_bitvector() {
+            let mut codec = Codec::new();
+            let bv: BitVector = "101".parse().unwrap();
+
+            codec.register_code(10, bv.clone());
+
+            assert!(codec.is_bitvector_encoded(&bv));
+        }
+
+        #[test]
+        fn returns_false_for_unregistered_bitvector() {
+            let codec = Codec::new();
+            let bv: BitVector = "101".parse().unwrap();
+
+            assert!(!codec.is_bitvector_encoded(&bv));
+        }
+
+        #[test]
+        fn returns_true_for_multiple_registered_bitvectors() {
+            let mut codec = Codec::new();
+
+            let bit_strings = ["1", "10", "101", "111"];
+            for (i, bits) in bit_strings.iter().enumerate() {
+                let bv: BitVector = bits.parse().unwrap();
+                codec.register_code(i as u8, bv);
+            }
+
+            for bits in &bit_strings {
+                let bv: BitVector = bits.parse().unwrap();
+                assert!(codec.is_bitvector_encoded(&bv));
+            }
+        }
+
+        #[test]
+        fn returns_true_for_different_instances_with_same_bits() {
+            let mut codec = Codec::new();
+
+            let bv1: BitVector = "101".parse().unwrap();
+            let bv2: BitVector = "101".parse().unwrap();
+
+            codec.register_code(42, bv1);
+
+            assert!(codec.is_bitvector_encoded(&bv2));
+        }
     }
 }
