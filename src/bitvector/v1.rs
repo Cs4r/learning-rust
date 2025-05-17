@@ -1,7 +1,8 @@
-use std::fmt::Display;
+use std::fmt;
+use std::fmt::{Debug, Display};
 use std::str::FromStr;
 
-#[derive(Debug, Hash, Eq)]
+#[derive(Hash, Eq)]
 pub struct BitVector {
     data: Vec<u8>,
     n_bits: usize,
@@ -109,6 +110,12 @@ impl Display for BitVector {
         }
 
         Ok(())
+    }
+}
+
+impl Debug for BitVector {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "BitVector({})", self)
     }
 }
 
@@ -475,8 +482,32 @@ mod tests {
         }
     }
 
+    mod debug_behavior {
+        use super::*;
+
+        #[test]
+        fn debug_shows_bitvector_with_label() {
+            let bv = BitVector::from_str("10101").unwrap();
+            let debug_output = format!("{:?}", bv);
+            assert_eq!(debug_output, "BitVector(10101)");
+        }
+
+        #[test]
+        fn debug_empty_bitvector() {
+            let bv = BitVector::from_str("").unwrap();
+            let debug_output = format!("{:?}", bv);
+            assert_eq!(debug_output, "BitVector()");
+        }
+
+        #[test]
+        fn debug_long_bitvector() {
+            let bv = BitVector::from_str("1100101001110001").unwrap();
+            let debug_output = format!("{:?}", bv);
+            assert_eq!(debug_output, "BitVector(1100101001110001)");
+        }
+    }
+
     mod from_str_behavior {
-        use std::fmt::format;
         use super::*;
 
         #[test]
