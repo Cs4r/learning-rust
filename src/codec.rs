@@ -28,6 +28,10 @@ impl Codec {
     pub fn is_bitvector_encoded(&self, bit_vector: &BitVector) -> bool {
         self.by_vector.contains_key(bit_vector)
     }
+
+    pub fn get_byte(&self, bit_vector: &BitVector) -> u8 {
+        *self.by_vector.get(bit_vector).unwrap()
+    }
 }
 
 #[cfg(test)]
@@ -206,6 +210,47 @@ mod tests {
             codec.register_code(42, bv1);
 
             assert!(codec.is_bitvector_encoded(&bv2));
+        }
+    }
+
+    mod get_byte_behavior {
+        use super::*;
+
+        #[test]
+        fn returns_registered_byte_for_bitvector() {
+            let mut codec = Codec::new();
+            let bv: BitVector = "101".parse().unwrap();
+            let byte = 42;
+
+            codec.register_code(byte, bv.clone());
+
+            assert_eq!(codec.get_byte(&bv), byte);
+        }
+
+        #[test]
+        #[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
+        fn panics_if_bitvector_not_registered() {
+            let codec = Codec::new();
+            let bv: BitVector = "101".parse().unwrap();
+
+            codec.get_byte(&bv);
+        }
+
+        #[test]
+        fn returns_correct_byte_for_multiplne_registered_bitvectors() {
+            let mut codec = Codec::new();
+
+            let pairs = [("1", 1), ("10", 2), ("101", 5), ("111", 7)];
+
+            for (bits, byte) in pairs.iter() {
+                let bv: BitVector = bits.parse().unwrap();
+                codec.register_code(*byte, bv);
+            }
+
+            for (bits, byte) in pairs.iter() {
+                let bv: BitVector = bits.parse().unwrap();
+                assert_eq!(codec.get_byte(&bv), *byte);
+            }
         }
     }
 }
