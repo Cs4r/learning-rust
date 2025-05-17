@@ -100,12 +100,7 @@ This will produce the encoded output in standard output (STDOUT), which you can 
 The codec file must follow this format:
 
 - The first line contains a single integer: the number of elements (character-to-code mappings) that follow.
-- Each subsequent line contains:
-  - a single character (or a space)
-  - followed by its Huffman encoding (a string of bits)
-  - separated by a space
-
-Each line must contain a single character followed by its Huffman encoding, separated by a space. Example:
+- Each line must contain a single character followed by its Huffman encoding, separated by a space. Example:
 
 ```
 3
