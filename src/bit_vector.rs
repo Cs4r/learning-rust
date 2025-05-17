@@ -1,5 +1,3 @@
-use std::ops::{Add, AddAssign};
-
 
 #[derive(Debug)]
 pub struct BitVector {
@@ -34,29 +32,7 @@ impl BitVector {
         n_bytes(self.n_bits)
     }
 
-    pub fn get(&self, bit_n: usize) -> bool {
-        assert!(bit_n < self.n_bits, "Index out of bounds");
-
-        let byte_index = byte_index(bit_n);
-        let bit_mask = mask(bit_n);
-
-        (self.data[byte_index] & bit_mask) != 0
-    }
-
-    pub fn set(&mut self, bit_n: usize, value: bool) {
-        let byte_index = byte_index(bit_n);
-        let bit_mask = mask(bit_n);
-
-        if value {
-            self.data[byte_index] |= bit_mask;
-        } else {
-            self.data[byte_index] &= !bit_mask;
-        }
-    }
-}
-
-impl AddAssign<bool> for BitVector {
-    fn add_assign(&mut self, x: bool) {
+    pub fn add_bit(&mut self, bit: bool) {
 
         if 8 * self.data.len() == self.n_bits {
             let new_len = if self.data.len() == 0 { 1 } else { self.data.len() * 2 };
@@ -65,36 +41,25 @@ impl AddAssign<bool> for BitVector {
 
         self.n_bits += 1;
 
-        let shift = 8 * self.n_bytes() - self.n_bits();
+        let shift = 8 * self.n_bytes() - self.n_bits;
         let last_byte = self.n_bytes() - 1;
 
-        if x {
-            self.data[last_byte] |= 1 << shift;
+        if bit {
+            self.data[last_byte] ^= 1 << shift;
         }
     }
 }
 
 impl PartialEq for BitVector {
     fn eq(&self, other: &Self) -> bool {
-        if self.n_bits != other.n_bits {
+
+        if self.n_bits() != other.n_bits() {
             return false;
         }
 
-        let full_bytes = self.n_bits / 8;
-        let leftover_bits = self.n_bits % 8;
-
-        // Compare full bytes
-        if self.data[..full_bytes] != other.data[..full_bytes] {
-            return false;
-        }
-
-        // If there are leftover bits, compare those with a mask
-        if leftover_bits > 0 {
-            let mask = (1 << leftover_bits) - 1;
-            let self_last = self.data[full_bytes] & mask;
-            let other_last = other.data[full_bytes] & mask;
-            if self_last != other_last {
-                return false;
+        for i in 0..self.n_bytes() {
+            if self.data[i] != other.data[i] {
+                return false
             }
         }
 
@@ -106,14 +71,6 @@ impl Eq for BitVector {}
 
 fn n_bytes(n_bits: usize) -> usize {
     (n_bits + 7) >> 3
-}
-
-fn byte_index(bit_n: usize) -> usize {
-    bit_n >> 3
-}
-
-fn mask(bit_n: usize) -> u8 {
-    1 << (bit_n & 7)
 }
 
 #[cfg(test)]
@@ -169,44 +126,44 @@ mod tests {
         }
     }
 
-    mod add_assign_behavior {
+    mod add_bit_behavior {
         use super::*;
 
         #[test]
-        fn test_add_assign_true_to_empty_vector() {
+        fn test_add_bit_true_to_empty_vector() {
             let mut bv = BitVector::new();
-            bv += true;
+            bv.add_bit(true);
             assert_eq!(bv.n_bits(), 1);
             assert_eq!(bv.n_bytes(), 1);
             assert_eq!(bv.data[0], 0b10000000);
         }
 
         #[test]
-        fn test_add_assign_false_to_empty_vector() {
+        fn test_add_bit_false_to_empty_vector() {
             let mut bv = BitVector::new();
-            bv += false;
+            bv.add_bit(false);
             assert_eq!(bv.n_bits(), 1);
             assert_eq!(bv.n_bytes(), 1);
             assert_eq!(bv.data[0], 0b00000000);
         }
 
         #[test]
-        fn test_add_assign_alternating_bits() {
+        fn test_add_bit_alternating_bits() {
             let mut bv = BitVector::new();
-            bv += true;
-            bv += false;
-            bv += true;
-            bv += false;
+            bv.add_bit(true);
+            bv.add_bit(false);
+            bv.add_bit(true);
+            bv.add_bit(false);
             assert_eq!(bv.n_bits(), 4);
             assert_eq!(bv.data.len(), 1);
             assert_eq!(bv.data[0], 0b10100000);
         }
 
         #[test]
-        fn test_add_assign_fill_one_byte() {
+        fn test_add_bit_fill_one_byte() {
             let mut bv = BitVector::new();
             for _ in 0..8 {
-                bv += true;
+                bv.add_bit(true);
             }
             assert_eq!(bv.n_bits(), 8);
             assert_eq!(bv.data.len(), 1);
@@ -214,13 +171,13 @@ mod tests {
         }
 
         #[test]
-        fn test_add_assign_triggers_resize() {
+        fn test_add_bit_triggers_resize() {
             let mut bv = BitVector::new();
             for _ in 0..8 {
-                bv += false;
+                bv.add_bit(false)
             }
             assert_eq!(bv.data.len(), 1);
-            bv += true; // 9th bit triggers resize
+            bv.add_bit(true); // 9th bit triggers resize
             assert_eq!(bv.n_bits(), 9);
             assert_eq!(bv.data.len(), 2);
             assert_eq!(bv.data[0], 0b00000000);
@@ -228,10 +185,10 @@ mod tests {
         }
 
         #[test]
-        fn test_add_assign_multiple_resizes() {
+        fn test_add_bit_multiple_resizes() {
             let mut bv = BitVector::new();
             for i in 0..100 {
-                bv += i % 2 == 0;
+                bv.add_bit(i % 2 == 0);
             }
             assert_eq!(bv.n_bits(), 100);
             assert!(bv.data.len() > 13);
@@ -240,21 +197,23 @@ mod tests {
         }
 
         #[test]
-        fn test_add_assign_only_false() {
+        fn test_add_bit_only_false() {
             let mut bv = BitVector::new();
             for _ in 0..16 {
-                bv += false;
+                bv.add_bit(false);
             }
             assert_eq!(bv.n_bits(), 16);
             assert_eq!(bv.data, vec![0b00000000, 0b00000000]);
         }
 
         #[test]
-        fn test_add_assign_only_true() {
+        fn test_add_bit_only_true() {
             let mut bv = BitVector::new();
+
             for _ in 0..16 {
-                bv += true;
+                bv.add_bit(true);
             }
+
             assert_eq!(bv.n_bits(), 16);
             assert_eq!(bv.data, vec![0b11111111, 0b11111111]);
         }
@@ -294,21 +253,6 @@ mod tests {
             bv2.data[0] = 0b0000_0010;
 
             assert_ne!(bv1, bv2);
-        }
-
-        #[test]
-        fn test_equal_with_unused_bits_ignored() {
-            // 10 bits = 1 full byte + 2 bits in next byte
-            let mut bv1 = BitVector::with_bits(10);
-            let mut bv2 = BitVector::with_bits(10);
-
-            bv1.data[0] = 0b10101010;
-            bv2.data[0] = 0b10101010;
-
-            bv1.data[1] = 0b00000011; // only lower 2 bits used
-            bv2.data[1] = 0b11111111; // bits beyond 2nd bit differ, but ignored
-
-            assert_eq!(bv1, bv2);
         }
 
         #[test]
@@ -356,94 +300,6 @@ mod tests {
             bv2.data = vec![0b11110000];
 
             assert_eq!(bv1, bv2);
-        }
-    }
-
-    mod get_set {
-        use super::*;
-
-        #[test]
-        fn test_get_empty_vector() {
-            let bv = BitVector::new();
-            let result = std::panic::catch_unwind(|| bv.get(0));
-            assert!(result.is_err());
-        }
-
-        #[test]
-        fn test_get_single_bit_set() {
-            let mut bv = BitVector::with_bits(8);
-
-            for i in 0..8 {
-                assert_eq!(bv.get(i), false);
-            }
-
-            bv.data[0] |= 1 << 3;
-            assert_eq!(bv.get(3), true);
-
-            for i in 0..8 {
-                if i != 3 {
-                    assert_eq!(bv.get(i), false);
-                }
-            }
-        }
-
-        #[test]
-        fn test_get_multiple_bytes() {
-            let mut bv = BitVector::with_bits(16);
-            bv.data[0] |= 1 << 0;
-            bv.data[1] |= 1 << 7;
-
-            assert_eq!(bv.get(0), true);
-            assert_eq!(bv.get(15), true);
-
-            for i in 1..15 {
-                assert_eq!(bv.get(i), false);
-            }
-        }
-
-        #[test]
-        #[should_panic(expected = "Index out of bounds")]
-        fn test_get_out_of_bounds() {
-            let bv = BitVector::with_bits(8);
-            bv.get(8);
-        }
-
-        #[test]
-        fn test_set_bit_true() {
-            let mut bv = BitVector::with_bits(16);
-            bv.set(3, true);
-            assert!(bv.get(3));
-            assert!(!bv.get(0));
-            assert!(!bv.get(15));
-        }
-
-        #[test]
-        fn test_set_bit_false() {
-            let mut bv = BitVector::with_bits(16);
-            bv.set(5, true);
-            assert!(bv.get(5));
-            bv.set(5, false);
-            assert!(!bv.get(5));
-        }
-
-        #[test]
-        fn test_set_multiple_bits() {
-            let mut bv = BitVector::with_bits(10);
-            bv.set(0, true);
-            bv.set(9, true);
-            assert!(bv.get(0));
-            assert!(bv.get(9));
-
-            for i in 1..9 {
-                assert!(!bv.get(i));
-            }
-        }
-
-        #[test]
-        #[should_panic]
-        fn test_set_out_of_bounds() {
-            let mut bv = BitVector::with_bits(8);
-            bv.set(8, true); // debería panic o manejar error
         }
     }
 }
