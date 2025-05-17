@@ -23,4 +23,8 @@ path = "bin/crc32_test.rs"
 name = "encode"
 path = "bin/encode.rs"
 
+[[bin]]
+name = "decode"
+path = "bin/decode.rs"
+
 [dependencies]
