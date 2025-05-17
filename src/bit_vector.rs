@@ -1,3 +1,6 @@
+use std::fmt::Display;
+use std::thread::sleep;
+
 #[derive(Debug, Hash, Eq)]
 pub struct BitVector {
     data: Vec<u8>,
@@ -32,9 +35,12 @@ impl BitVector {
     }
 
     pub fn add_bit(&mut self, bit: bool) {
-
         if 8 * self.data.len() == self.n_bits {
-            let new_len = if self.data.len() == 0 { 1 } else { self.data.len() * 2 };
+            let new_len = if self.data.len() == 0 {
+                1
+            } else {
+                self.data.len() * 2
+            };
             self.data.resize(new_len, 0);
         }
 
@@ -51,14 +57,13 @@ impl BitVector {
 
 impl PartialEq for BitVector {
     fn eq(&self, other: &Self) -> bool {
-
         if self.n_bits() != other.n_bits() {
             return false;
         }
 
         for i in 0..self.n_bytes() {
             if self.data[i] != other.data[i] {
-                return false
+                return false;
             }
         }
 
@@ -68,6 +73,35 @@ impl PartialEq for BitVector {
 
 fn n_bytes(n_bits: usize) -> usize {
     (n_bits + 7) >> 3
+}
+
+impl Display for BitVector {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        if self.n_bits() > 0 {
+            for i in 0..self.n_bytes() - 1 {
+                for  j in (0..=7).rev() {
+
+                    if self.data[i] &  (1 << j) != 0 {
+                        write!(f, "{}", '1')?;
+                    } else {
+                        write!(f, "{}", '0')?;
+                    }
+                }
+            }
+
+            let last_bit = 8 * self.n_bytes() - self.n_bits;
+
+            for j in (last_bit..=7).rev() {
+                if self.data[self.n_bytes() - 1] &  (1 << j) != 0 {
+                    write!(f, "{}", '1')?;
+                } else {
+                    write!(f, "{}", '0')?;
+                }
+            }
+        }
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -346,4 +380,79 @@ mod tests {
         }
     }
 
+
+    mod display_behavior {
+        use super::*;
+
+        #[test]
+        fn test_display_empty() {
+            let bv = BitVector::new();
+            let output = format!("{}", bv);
+            assert_eq!(output, "");
+        }
+
+        #[test]
+        fn test_display_single_bit_true() {
+            let mut bv = BitVector::new();
+            bv.add_bit(true);
+            let output = format!("{}", bv);
+            assert_eq!(output, "1");
+        }
+
+        #[test]
+        fn test_display_single_bit_false() {
+            let mut bv = BitVector::new();
+            bv.add_bit(false);
+            let output = format!("{}", bv);
+            assert_eq!(output, "0");
+        }
+
+        #[test]
+        fn test_display_multiple_bits() {
+            let mut bv = BitVector::new();
+            bv.add_bit(true);
+            bv.add_bit(false);
+            bv.add_bit(true);
+            bv.add_bit(true);
+            bv.add_bit(false);
+            let output = format!("{}", bv);
+            assert_eq!(output, "10110");
+        }
+
+        #[test]
+        fn test_display_full_byte() {
+            let mut bv = BitVector::new();
+            for _ in 0..8 {
+                bv.add_bit(true);
+            }
+            let output = format!("{}", bv);
+            assert_eq!(output, "11111111");
+        }
+
+        #[test]
+        fn test_display_partial_byte() {
+            let mut bv = BitVector::new();
+            bv.add_bit(true);
+            bv.add_bit(false);
+            bv.add_bit(false);
+            bv.add_bit(true);
+            let output = format!("{}", bv);
+            assert_eq!(output, "1001");
+        }
+
+        #[test]
+        fn test_display_multiple_bytes() {
+            let mut bv = BitVector::new();
+            // 12 bits: 10101010 1100 (last 4 bits)
+            let bits = [
+                true, false, true, false, true, false, true, false, // 8 bits = 0b10101010
+                true, true, false, false                             // 4 bits = 0b1100 (pad ignored)
+            ];
+            for &bit in &bits {
+                bv.add_bit(bit);
+            }
+            let output = format!("{}", bv);
+            assert_eq!(output, "101010101100");
+        }
+    }
 }
