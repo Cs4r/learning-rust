@@ -50,37 +50,43 @@ impl LzCoder {
 
     fn next(&mut self) -> i32 {
         self.distance = 0;
+        let len = self.vector.len() as isize;
         let mut cursor = self.index;
-        let mut i = self.index - 1;
-        let tam = self.vector.len() as isize;
-        let mut length: isize = 0;
-        let mut keep_searching = true;
+        let mut search_pos = self.index - 1;
+        let mut match_length: isize = 0;
 
-        while i >= 0 && cursor < tam && keep_searching {
-            if self.vector[i as usize] == self.vector[cursor as usize] {
+        while search_pos >= 0 && cursor < len {
+            if self.vector[search_pos as usize] == self.vector[cursor as usize] {
+                // Characters match, extend match
                 cursor += 1;
-                i += 1;
-                length += 1;
-                self.distance = (self.index - (i - length)) as i32;
+                search_pos += 1;
+                match_length += 1;
+                // Update distance: distance = current index - start position of the match in vector
+                self.distance = (self.index - (search_pos - match_length)) as i32;
 
-                if length == 258 || self.distance > 32768 {
-                    keep_searching = false;
+                // Stop if match is max length or distance too large
+                if match_length == 258 || self.distance > 32768 {
+                    break;
                 }
-            } else if length < 3 {
+            } else if match_length < 3 {
+                // Match too short, reset cursor and move search position one step backward
                 cursor = self.index;
-                i = i - length - 1;
-                length = 0;
+                search_pos = search_pos - match_length - 1;
+                match_length = 0;
                 self.distance = 0;
             } else {
-                keep_searching = false;
+                // Found a match >= 3, but current characters don't match, so stop searching
+                break;
             }
         }
 
-        if length >= 3 && self.distance <= 32768 {
+        // If a sufficiently long match found with valid distance
+        if match_length >= 3 && self.distance <= 32768 {
             self.index = cursor;
-            (length + 256) as i32
+            (match_length + 256) as i32 // Encoded length marker
         } else {
-            if self.index < tam {
+            // No match found, output literal byte or end marker (256)
+            if self.index < len {
                 let ch = self.vector[self.index as usize] as i32;
                 self.index += 1;
                 ch
@@ -89,6 +95,7 @@ impl LzCoder {
             }
         }
     }
+
 }
 
 #[cfg(test)]
