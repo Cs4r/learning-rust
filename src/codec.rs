@@ -4,7 +4,7 @@ use std::error::Error;
 use std::io::BufRead;
 use std::rc::Rc;
 
-struct Codec {
+pub struct Codec {
     by_byte: HashMap<u8, Rc<BitVector>>,
     by_vector: HashMap<Rc<BitVector>, u8>,
 }

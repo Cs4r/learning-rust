@@ -19,4 +19,8 @@ path = "bin/lrc_test.rs"
 name = "crc32_test"
 path = "bin/crc32_test.rs"
 
+[[bin]]
+name = "encode"
+path = "bin/encode.rs"
+
 [dependencies]
