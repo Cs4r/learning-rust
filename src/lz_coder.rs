@@ -48,4 +48,44 @@ mod tests {
             assert_eq!(coder.distance, 0);
         }
     }
+
+    mod from_reader_behaviour {
+        use std::io::Cursor;
+        use super::*;
+        #[test]
+        fn test_from_reader_ascii() {
+            let input = "hola mundo";
+            let cursor = Cursor::new(input.as_bytes());
+
+            let lz = LzCoder::from_reader(cursor).expect("Failed to read");
+
+            assert_eq!(lz.vector.len(), input.chars().count());
+
+            let collected: String = lz.vector.iter().collect();
+            assert_eq!(collected, input);
+        }
+
+        #[test]
+        fn test_from_reader_unicode() {
+            let input = "¡Hola, mundo! 😊";
+            let cursor = Cursor::new(input.as_bytes());
+
+            let lz = LzCoder::from_reader(cursor).expect("Failed to read");
+
+            assert_eq!(lz.vector.len(), input.chars().count());
+
+            let collected: String = lz.vector.iter().collect();
+            assert_eq!(collected, input);
+        }
+
+        #[test]
+        fn test_from_reader_empty() {
+            let input = "";
+            let cursor = Cursor::new(input.as_bytes());
+
+            let lz = LzCoder::from_reader(cursor).expect("Failed to read");
+
+            assert_eq!(lz.vector.len(), 0);
+        }
+    }
 }
