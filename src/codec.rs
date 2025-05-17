@@ -1,5 +1,7 @@
 use crate::bitvector::v1::BitVector;
 use std::collections::HashMap;
+use std::error::Error;
+use std::io::BufRead;
 use std::rc::Rc;
 
 struct Codec {
@@ -36,6 +38,37 @@ impl Codec {
     pub fn get_bitvector(&self, byte: u8) -> &BitVector {
         self.by_byte.get(&byte).unwrap()
     }
+
+
+    pub fn from_reader<R: BufRead>(mut reader: R) -> Result<Self, Box<dyn Error>> {
+        let mut first_line = String::new();
+        reader.read_line(&mut first_line)?;
+        let n: usize = first_line.trim().parse()?;
+
+        let mut codec = Codec::new();
+
+        for _ in 0..n {
+            let mut char_buf = [0u8; 1];
+            reader.read_exact(&mut char_buf)?;
+            let byte = char_buf[0];
+
+            let mut space_buf = [0u8; 1];
+            reader.read_exact(&mut space_buf)?;
+            if space_buf[0] != b' ' {
+                return Err("Expected space after character".into());
+            }
+
+            let mut bv_line = String::new();
+            reader.read_line(&mut bv_line)?;
+            let bit_str = bv_line.trim_end_matches(&['\r', '\n'][..]);
+
+            let bv: BitVector = bit_str.parse()?;
+            codec.register_code(byte, bv);
+        }
+
+        Ok(codec)
+    }
+
 }
 
 #[cfg(test)]
@@ -303,4 +336,83 @@ mod tests {
             }
         }
     }
+
+    mod from_reader_behavior {
+        use super::*;
+        use std::io::Cursor;
+
+        #[test]
+        fn parses_correctly() {
+            let data = "2\na 101\nb 010\n";
+
+            let cursor = Cursor::new(data);
+            let codec = Codec::from_reader(cursor).expect("Should parse correctly");
+
+            assert!(codec.is_byte_encoded(b'a'));
+            assert!(codec.is_byte_encoded(b'b'));
+
+            let bv_a = codec.get_bitvector(b'a');
+            assert_eq!(bv_a.to_string(), "101");
+
+            let bv_b = codec.get_bitvector(b'b');
+            assert_eq!(bv_b.to_string(), "010");
+        }
+
+        #[test]
+        fn handles_newline_as_byte() {
+            let data = "1\n\n 1010\n";
+            let cursor = std::io::Cursor::new(data);
+            let codec = Codec::from_reader(cursor).expect("Should parse newline byte");
+
+            assert!(codec.is_byte_encoded(b'\n'));
+            let bv_nl = codec.get_bitvector(b'\n');
+            assert_eq!(bv_nl.to_string(), "1010");
+        }
+
+        #[test]
+        fn returns_error_on_empty_file() {
+            let data = "";
+            let cursor = Cursor::new(data);
+
+            let res = Codec::from_reader(cursor);
+            assert!(res.is_err());
+        }
+
+        #[test]
+        fn returns_error_on_invalid_number_of_lines() {
+            let data = "not_a_number\n";
+            let cursor = Cursor::new(data);
+
+            let res = Codec::from_reader(cursor);
+            assert!(res.is_err());
+        }
+
+        #[test]
+        fn returns_error_on_unexpected_eof() {
+            let data = "2\na 1\n";
+            let cursor = Cursor::new(data);
+
+            let res = Codec::from_reader(cursor);
+            assert!(res.is_err());
+        }
+
+        #[test]
+        fn returns_error_on_missing_bitvector() {
+            let data = "1\na\n"; // only one token, no bitvector
+            let cursor = Cursor::new(data);
+
+            let res = Codec::from_reader(cursor);
+            assert!(res.is_err());
+        }
+
+        #[test]
+        fn returns_error_on_invalid_byte_length() {
+            let data = "1\nab 101\n"; // more than one char in byte field
+            let cursor = Cursor::new(data);
+
+            let res = Codec::from_reader(cursor);
+            assert!(res.is_err());
+        }
+    }
+
 }
