@@ -129,13 +129,42 @@ Reads a file containing a Huffman-encoded bitstream (as ASCII '0' and '1' charac
 Run the program providing the codec file and the encoded input file:
 
 ```bash
-   cargo run --bin decode -- <codec_file> <encoded_file> > decoded.txt
+   cargo run --bin decode -- <codec_file> <encoded_file> > <decoded_file>
 ```
 
 Example:
 
 ```bash
    cargo run --bin decode -- assets/huffman_ascii_es.txt assets/encoded.txt > decoded.txt
+```
+
+### 7. `lz77`
+
+Reads an input string, compresses it using an LZ77-based algorithm, and prints the compressed output to standard output. The compression identifies repeated substrings and encodes them as references, otherwise outputs literal characters.
+
+##### 📥 Input format
+ - The input is read from standard input (stdin) as a UTF-8 string. 
+ - The input can contain any valid UTF-8 characters, including ASCII and Unicode.
+
+##### 📤 Output format
+- Literal characters are printed as-is. 
+- Repeated sequences of length ≥ 3 are encoded as #REF(length,distance)# where:
+  - length is the length of the repeated substring plus 256, 
+  - distance is how far back the match starts relative to the current position.
+- The special code 256 signals end of input and is not printed.
+
+##### ✅ Usage
+
+Run the program, then enter the text to compress:
+
+```bash
+   cargo run --bin lz77 < <input_file> > <output_file>
+```
+
+Example:
+
+```bash
+   cargo run --bin lz77 -- < assets/sample.txt > assets/sample_compressed.txt
 ```
 
 ## 🛠 Requirements
