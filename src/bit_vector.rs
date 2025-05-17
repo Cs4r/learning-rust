@@ -1,5 +1,4 @@
 use std::fmt::Display;
-use std::thread::sleep;
 
 #[derive(Debug, Hash, Eq)]
 pub struct BitVector {
@@ -77,27 +76,25 @@ fn n_bytes(n_bits: usize) -> usize {
 
 impl Display for BitVector {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        if self.n_bits() > 0 {
-            for i in 0..self.n_bytes() - 1 {
-                for  j in (0..=7).rev() {
+        if self.n_bits == 0 {
+            return Ok(());
+        }
 
-                    if self.data[i] &  (1 << j) != 0 {
-                        write!(f, "{}", '1')?;
-                    } else {
-                        write!(f, "{}", '0')?;
-                    }
-                }
+        let total_bytes = self.n_bytes();
+
+        for i in 0..total_bytes - 1 {
+            for bit_pos in (0..=7).rev() {
+                let bit_set = self.data[i] & (1 << bit_pos) != 0;
+                write!(f, "{}" , if bit_set {'1'} else {'0'}   )?;
+
             }
+        }
 
-            let last_bit = 8 * self.n_bytes() - self.n_bits;
+        let last_bit = 8 * total_bytes - self.n_bits;
 
-            for j in (last_bit..=7).rev() {
-                if self.data[self.n_bytes() - 1] &  (1 << j) != 0 {
-                    write!(f, "{}", '1')?;
-                } else {
-                    write!(f, "{}", '0')?;
-                }
-            }
+        for bit_pos in (last_bit..=7).rev() {
+            let bit_set = self.data[total_bytes-1] & (1 << bit_pos) != 0;
+            write!(f, "{}" , if bit_set {'1'} else {'0'}   )?;
         }
 
         Ok(())
@@ -380,7 +377,6 @@ mod tests {
         }
     }
 
-
     mod display_behavior {
         use super::*;
 
@@ -446,7 +442,7 @@ mod tests {
             // 12 bits: 10101010 1100 (last 4 bits)
             let bits = [
                 true, false, true, false, true, false, true, false, // 8 bits = 0b10101010
-                true, true, false, false                             // 4 bits = 0b1100 (pad ignored)
+                true, true, false, false, // 4 bits = 0b1100 (pad ignored)
             ];
             for &bit in &bits {
                 bv.add_bit(bit);
