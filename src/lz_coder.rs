@@ -1,5 +1,5 @@
 pub struct LzCoder {
-    vector: Vec<u8>,
+    vector: Vec<char>,
     index: usize,
     distance: u32,
 }
