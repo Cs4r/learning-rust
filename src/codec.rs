@@ -20,6 +20,10 @@ impl Codec {
         self.by_vector.insert(Rc::clone(&shared), byte);
         self.by_byte.insert(byte, shared);
     }
+
+    pub fn is_byte_enconded(&self, byte: u8) -> bool {
+        self.by_byte.contains_key(&byte)
+    }
 }
 
 #[cfg(test)]
@@ -80,5 +84,29 @@ mod tests {
 
             assert_eq!(codec.by_vector.get(stored_bit_vector), Some(&byte_key));
         }
+    }
+
+    mod is_byte_encoded_behavior {
+        use super::*;
+
+        #[test]
+        fn returns_false_when_byte_not_registered() {
+            let empty_codec = Codec::new();
+
+            assert!(!empty_codec.is_byte_enconded(4));
+        }
+
+        #[test]
+        fn returns_true_when_byte_registered() {
+            let mut codec = Codec::new();
+
+            let byte = 55;
+            codec.register_code(byte, BitVector::new());
+            
+            assert!(codec.is_byte_enconded(byte));
+        }
+
+
+
     }
 }
