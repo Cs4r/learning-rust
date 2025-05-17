@@ -1,5 +1,4 @@
-
-#[derive(Debug)]
+#[derive(Debug, Hash, Eq)]
 pub struct BitVector {
     data: Vec<u8>,
     n_bits: usize,
@@ -66,8 +65,6 @@ impl PartialEq for BitVector {
         true
     }
 }
-
-impl Eq for BitVector {}
 
 fn n_bytes(n_bits: usize) -> usize {
     (n_bits + 7) >> 3
@@ -302,4 +299,51 @@ mod tests {
             assert_eq!(bv1, bv2);
         }
     }
+
+    mod hash_behavior {
+        use super::*;
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
+
+        fn calculate_hash<T: Hash>(t: &T) -> u64 {
+            let mut hasher = DefaultHasher::new();
+            t.hash(&mut hasher);
+            hasher.finish()
+        }
+
+        #[test]
+        fn test_equal_vectors_have_same_hash() {
+            let mut a = BitVector::new();
+            let mut b = BitVector::new();
+
+            a.add_bit(true);
+            a.add_bit(false);
+            a.add_bit(true);
+
+            b.add_bit(true);
+            b.add_bit(false);
+            b.add_bit(true);
+
+            assert_eq!(a, b);
+            assert_eq!(calculate_hash(&a), calculate_hash(&b));
+        }
+
+        #[test]
+        fn test_different_vectors_have_different_hashes() {
+            let mut a = BitVector::new();
+            let mut b = BitVector::new();
+
+            a.add_bit(true);
+            a.add_bit(false);
+            a.add_bit(true);
+
+            b.add_bit(true);
+            b.add_bit(true);
+            b.add_bit(false);
+
+            assert_ne!(a, b);
+            assert_ne!(calculate_hash(&a), calculate_hash(&b));
+        }
+    }
+
 }
