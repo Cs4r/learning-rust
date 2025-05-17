@@ -69,6 +69,57 @@ Or interactively:
 cargo run --bin crc32_test
 ```
 
+### 5. `encode`
+
+Encodes a plain text file using a custom Huffman codec.
+
+This program reads a file containing a Huffman encoding table (one line per character and bit sequence), then uses that codec to transform an input text file into its corresponding Huffman-encoded bitstream.
+
+##### ✅ Usage
+
+```bash
+    cargo run --bin encode -- <codec_file> <input_file>
+```
+
+Where:
+
+- <codec_file> is a plain text file containing ASCII character-to-bits mappings (one per line),
+
+- <input_file> is the text file you want to encode using the codec.
+
+For example:
+
+```bash
+    cargo run --bin encode -- assets/huffman_ascii_es.txt assets/constitution.txt > encoded.txt
+```
+
+This will produce the encoded output in standard output (STDOUT), which you can redirect to a file as shown.
+
+##### 📥 Input format (codec_file)
+
+The codec file must follow this format:
+
+- The first line contains a single integer: the number of elements (character-to-code mappings) that follow.
+- Each subsequent line contains:
+  - a single character (or a space)
+  - followed by its Huffman encoding (a string of bits)
+  - separated by a space
+
+Each line must contain a single character followed by its Huffman encoding, separated by a space. Example:
+
+```
+3
+e 010
+n 0110
+s 0111
+```
+
+Lines without a character (just a space followed by bits) are used to encode the space character.
+
+##### 📤 Output
+
+The program prints the encoded bitstream (as a sequence of '0' and '1' characters) to stdout.
+
 ## 🛠 Requirements
 
 - Rust (edition 2024)
