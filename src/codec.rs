@@ -32,6 +32,10 @@ impl Codec {
     pub fn get_byte(&self, bit_vector: &BitVector) -> u8 {
         *self.by_vector.get(bit_vector).unwrap()
     }
+
+    pub fn get_bitvector(&self, byte: u8) -> &BitVector {
+        self.by_byte.get(&byte).unwrap()
+    }
 }
 
 #[cfg(test)]
@@ -250,6 +254,52 @@ mod tests {
             for (bits, byte) in pairs.iter() {
                 let bv: BitVector = bits.parse().unwrap();
                 assert_eq!(codec.get_byte(&bv), *byte);
+            }
+        }
+    }
+
+    mod get_bitvector_behavior {
+        use super::*;
+
+        #[test]
+        fn returns_correct_bitvector_after_registering() {
+            let mut codec = Codec::new();
+            let bv: BitVector = "101".parse().unwrap();
+
+            codec.register_code(10, bv.clone());
+
+            let retrieved = codec.get_bitvector(10);
+            assert_eq!(retrieved, &bv);
+        }
+
+        #[test]
+        #[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
+        fn panics_when_byte_not_registered() {
+            let codec = Codec::new();
+            // No registration of byte 42
+
+            codec.get_bitvector(42); // Should panic because 42 not registered
+        }
+
+        #[test]
+        fn works_with_multiple_registered_bitvectors() {
+            let mut codec = Codec::new();
+
+            let pairs = [
+                (1, "0"),
+                (2, "1"),
+                (3, "11"),
+            ];
+
+            for (byte, bits) in pairs.iter() {
+                let bv: BitVector = bits.parse().unwrap();
+                codec.register_code(*byte, bv);
+            }
+
+            for (byte, bits) in pairs.iter() {
+                let expected: BitVector = bits.parse().unwrap();
+                let actual = codec.get_bitvector(*byte);
+                assert_eq!(actual, &expected);
             }
         }
     }
