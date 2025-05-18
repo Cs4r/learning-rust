@@ -2,13 +2,21 @@ use std::sync::OnceLock;
 
 struct Crc32(u32);
 
-
 impl Crc32 {
     pub fn new() -> Self {
         Crc32(0xFFFFFFFF)
     }
-}
 
+    pub fn get(&mut self) -> u32 {
+        self.0 = self.0 ^ 0xFFFFFFFF;
+        self.0
+    }
+
+    pub fn add(&mut self, byte: u8) {
+        let index = ((self.0 as u8 ^ byte) & 0xFF) as usize;
+        self.0 = (self.0 >> 8) ^ crc32_table()[index];
+    }
+}
 
 pub fn crc32(input: &[u8]) -> u32 {
     let table = crc32_table();
@@ -54,6 +62,23 @@ mod tests {
             let crc32 = Crc32::new();
 
             assert_eq!(crc32.0, 0xFFFFFFFF);
+        }
+    }
+    
+    mod get_behavior {
+        use crate::crc32::{crc32, Crc32};
+
+        #[test]
+        fn test_crc32_hello_world() {
+            let data = b"hello world";
+            
+            let mut crc32 = Crc32::new();
+            
+            for i in data {
+                crc32.add(*i);
+            }
+            
+            assert_eq!(crc32.get(), 0x0D4A1185);
         }
     }
 
