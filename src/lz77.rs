@@ -1,4 +1,6 @@
 use crate::crc32::Crc32;
+use std::error::Error;
+use std::io::BufRead;
 
 struct Lz77 {
     vector: Vec<u8>,
@@ -7,24 +9,35 @@ struct Lz77 {
     crc: Crc32,
 }
 
-
-
 impl Lz77 {
-
     pub fn new() -> Lz77 {
-        Lz77{
+        Lz77 {
             vector: vec![],
             index: 0,
             distance: 0,
             crc: Crc32::new(),
         }
     }
-    
+
     pub fn add(&mut self, byte: u8) {
         self.vector.push(byte);
         self.crc.add(byte);
     }
 
+    pub fn from_reader<R: BufRead>(mut reader: R) -> Result<Self, Box<dyn Error>> {
+        let mut lz77 = Lz77::new();
+        let mut buffer = Vec::new();
+
+        reader.read_to_end(&mut buffer)?;
+
+        let s = String::from_utf8(buffer)?;
+
+        for ch in s.bytes() {
+            lz77.add(ch);
+        }
+
+        Ok(lz77)
+    }
 }
 
 #[cfg(test)]
@@ -60,4 +73,22 @@ mod tests {
         }
     }
 
+    mod from_reader_behavior {
+        use super::*;
+        use std::io::Cursor;
+        #[test]
+        fn test_from_reader_ascii() {
+            let input = "hola mundo";
+            let cursor = Cursor::new(input.as_bytes());
+
+            let lz77 = Lz77::from_reader(cursor).expect("Failed to read");
+
+            assert_eq!(lz77.vector.len(), input.bytes().count());
+
+            let collected: String = lz77.vector.iter().map(|c| *c as char).collect();
+            
+            assert_eq!(collected, input);
+        }
+
+    }
 }
