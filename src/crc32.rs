@@ -1,5 +1,15 @@
 use std::sync::OnceLock;
 
+struct Crc32(u32);
+
+
+impl Crc32 {
+    pub fn new() -> Self {
+        Crc32(0xFFFFFFFF)
+    }
+}
+
+
 pub fn crc32(input: &[u8]) -> u32 {
     let table = crc32_table();
     let mut crc32: u32 = 0xFFFFFFFF;
@@ -35,6 +45,17 @@ fn crc32_table() -> &'static [u32; 256] {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    mod constructor {
+        use crate::crc32::Crc32;
+
+        #[test]
+        fn new_sets_all_bits_to_one() {
+            let crc32 = Crc32::new();
+
+            assert_eq!(crc32.0, 0xFFFFFFFF);
+        }
+    }
 
     mod crc32_function_behavior {
         use crate::crc32::crc32;
