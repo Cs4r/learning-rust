@@ -32,39 +32,41 @@ fn crc32_table() -> &'static [u32; 256] {
     })
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_crc32_empty() {
-        let data = b"";
-        assert_eq!(crc32(data), 0);
-    }
+    mod crc32_function_behavior {
+        use crate::crc32::crc32;
+        #[test]
+        fn test_crc32_empty() {
+            let data = b"";
+            assert_eq!(crc32(data), 0);
+        }
 
-    #[test]
-    fn test_crc32_hello_world() {
-        let data = b"hello world";
-        assert_eq!(crc32(data), 0x0D4A1185);
-    }
+        #[test]
+        fn test_crc32_hello_world() {
+            let data = b"hello world";
+            assert_eq!(crc32(data), 0x0D4A1185);
+        }
 
-    #[test]
-    fn test_crc32_known_value() {
-        let data = b"123456789";
-        assert_eq!(crc32(data), 0xCBF43926);
-    }
+        #[test]
+        fn test_crc32_known_value() {
+            let data = b"123456789";
+            assert_eq!(crc32(data), 0xCBF43926);
+        }
 
-    #[test]
-    fn test_crc32_single_byte() {
-        let data = b"a";
-        assert_eq!(crc32(data), 0xE8B7BE43);
-    }
+        #[test]
+        fn test_crc32_single_byte() {
+            let data = b"a";
+            assert_eq!(crc32(data), 0xE8B7BE43);
+        }
 
-    #[test]
-    fn test_crc32_case_sensitive() {
-        let data1 = b"ABC";
-        let data2 = b"abc";
-        assert_ne!(crc32(data1), crc32(data2));
+        #[test]
+        fn test_crc32_case_sensitive() {
+            let data1 = b"ABC";
+            let data2 = b"abc";
+            assert_ne!(crc32(data1), crc32(data2));
+        }
     }
 }
