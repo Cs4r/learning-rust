@@ -6,3 +6,4 @@ pub mod crc32;
 pub mod bitvector;
 pub mod codec;
 pub mod lz_coder;
+pub mod lz77;
