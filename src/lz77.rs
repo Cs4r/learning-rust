@@ -26,14 +26,10 @@ impl Lz77 {
 
     pub fn from_reader<R: BufRead>(mut reader: R) -> Result<Self, Box<dyn Error>> {
         let mut lz77 = Lz77::new();
-        let mut buffer = Vec::new();
 
-        reader.read_to_end(&mut buffer)?;
-
-        let s = String::from_utf8(buffer)?;
-
-        for ch in s.bytes() {
-            lz77.add(ch);
+        for byte_result in reader.bytes() {
+            let byte = byte_result?;
+            lz77.add(byte);
         }
 
         Ok(lz77)
