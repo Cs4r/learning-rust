@@ -50,6 +50,12 @@ fn crc32_table() -> &'static [u32; 256] {
     })
 }
 
+impl PartialEq for Crc32 {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
