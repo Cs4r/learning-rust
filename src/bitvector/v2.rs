@@ -126,5 +126,17 @@ mod tests {
             assert_eq!(bv.n_bytes(), 1);
             assert_eq!(bv.data[0], 0b00000000);
         }
+
+        #[test]
+        fn test_add_bit_alternating_bits() {
+            let mut bv = BitVector::new();
+            bv.add_bit(true);
+            bv.add_bit(false);
+            bv.add_bit(true);
+            bv.add_bit(false);
+            assert_eq!(bv.n_bits(), 4);
+            assert_eq!(bv.data.len(), 1);
+            assert_eq!(bv.data[0], 0b00000101);
+        }
     }
 }
