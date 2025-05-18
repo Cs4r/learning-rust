@@ -80,6 +80,15 @@ mod tests {
             
             assert_eq!(crc32.get(), 0x0D4A1185);
         }
+
+        #[test]
+        fn test_crc32_empty() {
+            let data = b"";
+
+            let mut crc32 = Crc32::new();
+            
+            assert_eq!(crc32.get(), 0);
+        }
     }
 
     mod crc32_function_behavior {
