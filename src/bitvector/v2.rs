@@ -102,8 +102,19 @@ impl BitVector {
         Ok(bv)
     }
 
-    pub fn revert(&self) {
-        // nothing
+    pub fn revert(&mut self) {
+        let mut x = false;
+        let mut y = false;
+
+        for i in 0..(self.n_bits / 2) {
+            let j = self.n_bits - 1 - i;
+
+            x = self.get(i);
+            y = self.get(j);
+
+            self.set(i, y);
+            self.set(j, x);
+        }
     }
 }
 
@@ -700,8 +711,8 @@ mod tests {
     }
 
     mod revert_behavior {
-        use std::hint::assert_unchecked;
         use super::*;
+        use std::hint::assert_unchecked;
 
         #[test]
         fn test_revert_empty_vector() {
@@ -715,20 +726,20 @@ mod tests {
 
         #[test]
         fn test_revert_with_one_bit_vector() {
-            let mut bv1 : BitVector = "1".parse().unwrap();
+            let mut bv1: BitVector = "1".parse().unwrap();
             bv1.revert();
 
             let expected = "1".parse().unwrap();
             assert_eq!(bv1, expected);
         }
 
-        // #[test]
-        // fn test_revert_with_two_bit_vectors() {
-        //     let mut bv1 : BitVector = "10".parse().unwrap();
-        //     bv1.revert();
-        // 
-        //     let bv2 = "01".parse().unwrap();
-        //     assert_eq!(bv1, bv2);
-        // }
+        #[test]
+        fn test_revert_with_two_bit_vectors() {
+            let mut bv1: BitVector = "10".parse().unwrap();
+            bv1.revert();
+
+            let expected = "01".parse().unwrap();
+            assert_eq!(bv1, expected);
+        }
     }
 }
