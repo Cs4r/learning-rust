@@ -34,6 +34,18 @@ impl Lz77 {
 
         Ok(lz77)
     }
+
+    pub fn get_distance(&self) -> i32 {
+        self.distance
+    }
+
+    pub fn get_crc32(&mut self) -> u32 {
+        self.crc.get()
+    }
+
+    pub fn get_size(&self) -> usize {
+        self.vector.len()
+    }
 }
 
 #[cfg(test)]
@@ -104,7 +116,7 @@ mod tests {
 
             assert_eq!(lz77.vector.len(), input.bytes().count());
             let collected = String::from_utf8(lz77.vector).unwrap();
-            
+
             assert_eq!(collected, input);
         }
     }
