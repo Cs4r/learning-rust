@@ -753,12 +753,19 @@ mod tests {
 
         #[test]
         fn test_revert_with_more_than_8_bits() {
-            let x = "100100000";
-
-            let mut bv1: BitVector = x.parse().unwrap();
+            let mut bv1: BitVector = "100100000".parse().unwrap();
             bv1.revert();
 
             let expected = "000001001".parse().unwrap();
+            assert_eq!(bv1, expected);
+        }
+
+        #[test]
+        fn test_revert_with_2_bytes() {
+            let mut bv1: BitVector = "1110000100010110".parse().unwrap();
+            bv1.revert();
+
+            let expected = "0110100010000111".parse().unwrap();
             assert_eq!(bv1, expected);
         }
     }
