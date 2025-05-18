@@ -104,4 +104,27 @@ mod tests {
             assert!(bv.data.iter().all(|&b| b == 0));
         }
     }
+
+    mod add_bit_behavior {
+        use super::*; 
+
+        #[test]
+        fn test_add_bit_true_to_empty_vector() {
+            let mut bv = BitVector::new();
+            bv.add_bit(true);
+            assert_eq!(bv.n_bits(), 1);
+            assert_eq!(bv.n_bytes(), 1);
+
+            assert_eq!(bv.data[0], 0b00000001);
+        }
+
+        #[test]
+        fn test_add_bit_false_to_empty_vector() {
+            let mut bv = BitVector::new();
+            bv.add_bit(false);
+            assert_eq!(bv.n_bits(), 1);
+            assert_eq!(bv.n_bytes(), 1);
+            assert_eq!(bv.data[0], 0b00000000);
+        }
+    }
 }
