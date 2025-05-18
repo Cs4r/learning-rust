@@ -790,8 +790,8 @@ mod tests {
 
         #[test]
         fn test_append_vector_to_empty_vector() {
-            const VALUE: &'static str = "10101";
             let mut bv = BitVector::new();
+            const VALUE: &str = "10101";
 
             bv.append(VALUE.parse().unwrap());
             assert_eq!(bv.to_string(), VALUE);
