@@ -22,6 +22,22 @@ impl BitVector {
         }
     }
 
+    fn from_value(n: u32, n_bits: usize) -> BitVector {
+        let mut  bit_vector = BitVector::new();
+
+        bit_vector.n_bits = 0;
+        bit_vector.data.resize(n_bytes(n_bits), 0);
+
+        let mut n = n;
+
+        for _ in 0..n_bits {
+            bit_vector.add_bit(n & 1 != 0);
+            n/=2;
+        }
+
+        bit_vector
+    }
+
     fn n_bits(&self) -> usize {
         self.n_bits
     }
@@ -258,6 +274,55 @@ mod tests {
 
             assert_eq!(bv.n_bits(), 16);
             assert_eq!(bv.data, vec![0b11111111, 0b11111111]);
+        }
+    }
+
+    mod from_value_behavior {
+        use super::*;
+
+        #[test]
+        fn test_from_value_zero_bits() {
+            let bv = BitVector::from_value(0, 0);
+            assert_eq!(bv.n_bits(), 0);
+            assert_eq!(bv.n_bytes(), 0);
+        }
+
+        #[test]
+        fn test_from_value_one_bit_set() {
+            let bv = BitVector::from_value(1, 1);
+            assert_eq!(bv.n_bits(), 1);
+            assert_eq!(bv.get(0), true);
+        }
+
+        #[test]
+        fn test_from_value_multiple_bits() {
+            let bv = BitVector::from_value(5, 4);
+            assert_eq!(bv.n_bits(), 4);
+            assert_eq!(bv.get(0), true);  // LSB
+            assert_eq!(bv.get(1), false);
+            assert_eq!(bv.get(2), true);
+            assert_eq!(bv.get(3), false);
+        }
+
+        #[test]
+        fn test_from_value_padded_with_zeros() {
+            let bv = BitVector::from_value(3, 8);
+            assert_eq!(bv.n_bits(), 8);
+            assert_eq!(bv.get(0), true);
+            assert_eq!(bv.get(1), true);
+            
+            for i in 2..8 {
+                assert_eq!(bv.get(i), false, "bit {} should be false", i);
+            }
+        }
+
+        #[test]
+        fn test_from_value_truncates_higher_bits() {
+            let bv = BitVector::from_value(255, 4);
+            assert_eq!(bv.n_bits(), 4);
+            for i in 0..4 {
+                assert!(bv.get(i), "bit {} should be true", i);
+            }
         }
     }
 }
