@@ -75,7 +75,7 @@ mod tests {
 
     mod from_reader_behavior {
         use super::*;
-        use std::io::Cursor;
+        use std::io::{Cursor, Read};
         #[test]
         fn test_from_reader_ascii() {
             let input = "hola mundo";
@@ -86,19 +86,30 @@ mod tests {
             assert_eq!(lz77.vector.len(), input.bytes().count());
 
             let collected: String = lz77.vector.iter().map(|c| *c as char).collect();
-            
+
             assert_eq!(collected, input);
         }
-        
-            #[test]
+
+        #[test]
         fn test_from_reader_empty() {
             let input = "";
             let cursor = Cursor::new(input.as_bytes());
 
-            let lz_coder = Lz77::from_reader(cursor).expect("Failed to read");
+            let lz77 = Lz77::from_reader(cursor).expect("Failed to read");
 
-            assert_eq!(lz_coder.vector.len(), 0);
+            assert_eq!(lz77.vector.len(), 0);
         }
+        #[test]
+        fn test_from_reader_unicode() {
+            let input = "¡Hola, mundo! 😊";
+            let cursor = Cursor::new(input.as_bytes());
 
+            let lz77 = Lz77::from_reader(cursor).expect("Failed to read");
+
+            assert_eq!(lz77.vector.len(), input.bytes().count());
+            let collected = String::from_utf8(lz77.vector).unwrap();
+            
+            assert_eq!(collected, input);
+        }
     }
 }
