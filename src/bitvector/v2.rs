@@ -1,3 +1,8 @@
+use std::fmt;
+use std::fmt::{Debug, Display};
+use std::str::FromStr;
+
+#[derive(Hash, Eq)]
 struct BitVector {
     data: Vec<u8>,
     n_bits: usize,
@@ -23,7 +28,7 @@ impl BitVector {
     }
 
     fn from_value(n: u32, n_bits: usize) -> BitVector {
-        let mut  bit_vector = BitVector::new();
+        let mut bit_vector = BitVector::new();
 
         bit_vector.n_bits = 0;
         bit_vector.data.resize(n_bytes(n_bits), 0);
@@ -32,7 +37,7 @@ impl BitVector {
 
         for _ in 0..n_bits {
             bit_vector.add_bit(n & 1 != 0);
-            n/=2;
+            n /= 2;
         }
 
         bit_vector
@@ -81,6 +86,62 @@ impl BitVector {
         if value {
             self.set(self.n_bits - 1, true);
         }
+    }
+}
+
+impl PartialEq for BitVector {
+    fn eq(&self, other: &Self) -> bool {
+        if self.n_bits() != other.n_bits() {
+            return false;
+        }
+
+        for i in 0..self.n_bytes() {
+            if self.data[i] != other.data[i] {
+                return false;
+            }
+        }
+
+        true
+    }
+}
+
+impl Display for BitVector {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        if self.n_bits == 0 {
+            return Ok(());
+        }
+
+        let total_bytes = self.n_bytes();
+
+        for i in 0..total_bytes - 1 {
+            for bit_pos in (0..=7).rev() {
+                let bit_set = self.data[i] & (1 << bit_pos) != 0;
+                write!(f, "{}", if bit_set { '1' } else { '0' })?;
+            }
+        }
+
+        let last_bit = 8 * total_bytes - self.n_bits;
+
+        for bit_pos in (last_bit..=7).rev() {
+            let bit_set = self.data[total_bytes - 1] & (1 << bit_pos) != 0;
+            write!(f, "{}", if bit_set { '1' } else { '0' })?;
+        }
+
+        Ok(())
+    }
+}
+
+impl Debug for BitVector {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "BitVector({})", self)
+    }
+}
+
+impl FromStr for BitVector {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        BitVector::from_str(s)
     }
 }
 
@@ -137,10 +198,18 @@ mod tests {
             }
 
             bv.set(3, true);
-            assert_eq!(bv.get(3), true, "bit 3 should be true after setting to true");
+            assert_eq!(
+                bv.get(3),
+                true,
+                "bit 3 should be true after setting to true"
+            );
 
             bv.set(3, false);
-            assert_eq!(bv.get(3), false, "bit 3 should be false after setting to false");
+            assert_eq!(
+                bv.get(3),
+                false,
+                "bit 3 should be false after setting to false"
+            );
         }
 
         #[test]
@@ -298,7 +367,7 @@ mod tests {
         fn test_from_value_multiple_bits() {
             let bv = BitVector::from_value(5, 4);
             assert_eq!(bv.n_bits(), 4);
-            assert_eq!(bv.get(0), true);  // LSB
+            assert_eq!(bv.get(0), true); // LSB
             assert_eq!(bv.get(1), false);
             assert_eq!(bv.get(2), true);
             assert_eq!(bv.get(3), false);
@@ -310,7 +379,7 @@ mod tests {
             assert_eq!(bv.n_bits(), 8);
             assert_eq!(bv.get(0), true);
             assert_eq!(bv.get(1), true);
-            
+
             for i in 2..8 {
                 assert_eq!(bv.get(i), false, "bit {} should be false", i);
             }
@@ -323,6 +392,136 @@ mod tests {
             for i in 0..4 {
                 assert!(bv.get(i), "bit {} should be true", i);
             }
+        }
+    }
+
+    mod equality_behavior {
+        use super::*;
+
+        #[test]
+        fn eq_same_empty_vectors() {
+            let bv1 = BitVector::new();
+            let bv2 = BitVector::new();
+            assert_eq!(bv1, bv2);
+        }
+
+        #[test]
+        fn eq_same_content() {
+            let bv1 = BitVector::with_bits(10);
+            let bv2 = BitVector::with_bits(10);
+
+            assert_eq!(bv1, bv2);
+        }
+
+        #[test]
+        fn neq_different_n_bits() {
+            let bv1 = BitVector::with_bits(5);
+            let bv2 = BitVector::with_bits(10);
+            assert_ne!(bv1, bv2);
+        }
+
+        #[test]
+        fn neq_different_data() {
+            let mut bv1 = BitVector::with_bits(8);
+            let mut bv2 = BitVector::with_bits(8);
+
+            bv1.data[0] = 0b0000_0001;
+            bv2.data[0] = 0b0000_0010;
+
+            assert_ne!(bv1, bv2);
+        }
+
+        #[test]
+        fn test_not_equal_due_to_used_bits_difference() {
+            let mut bv1 = BitVector::with_bits(10);
+            let mut bv2 = BitVector::with_bits(10);
+
+            bv1.data[0] = 0b10101010;
+            bv2.data[0] = 0b10101010;
+
+            bv1.data[1] = 0b00000011;
+            bv2.data[1] = 0b00000010; // difference in used bit
+
+            assert_ne!(bv1, bv2);
+        }
+
+        #[test]
+        fn test_equal_full_bytes() {
+            let mut bv1 = BitVector::with_bits(16);
+            let mut bv2 = BitVector::with_bits(16);
+
+            bv1.data[0] = 0xFF;
+            bv1.data[1] = 0xAA;
+
+            bv2.data[0] = 0xFF;
+            bv2.data[1] = 0xAA;
+
+            assert_eq!(bv1, bv2);
+        }
+
+        #[test]
+        fn test_not_equal_different_sizes() {
+            let bv1 = BitVector::with_bits(8);
+            let bv2 = BitVector::with_bits(9);
+
+            assert_ne!(bv1, bv2);
+        }
+
+        #[test]
+        fn test_eq_zero_bits_nonempty_data() {
+            let mut bv1 = BitVector::with_bits(0);
+            let mut bv2 = BitVector::with_bits(0);
+
+            bv1.data = vec![0b10101010];
+            bv2.data = vec![0b11110000];
+
+            assert_eq!(bv1, bv2);
+        }
+    }
+
+    mod hash_behavior {
+        use super::*;
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
+
+        fn calculate_hash<T: Hash>(t: &T) -> u64 {
+            let mut hasher = DefaultHasher::new();
+            t.hash(&mut hasher);
+            hasher.finish()
+        }
+
+        #[test]
+        fn test_equal_vectors_have_same_hash() {
+            let mut a = BitVector::new();
+            let mut b = BitVector::new();
+
+            a.add_bit(true);
+            a.add_bit(false);
+            a.add_bit(true);
+
+            b.add_bit(true);
+            b.add_bit(false);
+            b.add_bit(true);
+
+            assert_eq!(a, b);
+            assert_eq!(calculate_hash(&a), calculate_hash(&b));
+        }
+
+        #[test]
+        fn test_different_vectors_have_different_hashes() {
+            let mut a = BitVector::new();
+            let mut b = BitVector::new();
+
+            a.add_bit(true);
+            a.add_bit(false);
+            a.add_bit(true);
+
+            b.add_bit(true);
+            b.add_bit(true);
+            b.add_bit(false);
+
+            assert_ne!(a, b);
+            assert_ne!(calculate_hash(&a), calculate_hash(&b));
         }
     }
 }
