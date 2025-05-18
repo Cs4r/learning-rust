@@ -700,6 +700,7 @@ mod tests {
     }
 
     mod revert_behavior {
+        use std::hint::assert_unchecked;
         use super::*;
 
         #[test]
@@ -709,6 +710,16 @@ mod tests {
 
             bv1.revert();
 
+            assert_eq!(bv1, bv2);
+        }
+
+        #[test]
+
+        fn test_revert_with_one_bit_vector() {
+            let mut bv1 : BitVector = "1".parse().unwrap();
+            bv1.revert();
+
+            let bv2 = "1".parse().unwrap();
             assert_eq!(bv1, bv2);
         }
     }
