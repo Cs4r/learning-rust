@@ -706,11 +706,11 @@ mod tests {
         #[test]
         fn test_revert_empty_vector() {
             let mut bv1 = BitVector::new();
-            let bv2 = bv1.clone();
+            let expected = bv1.clone();
 
             bv1.revert();
 
-            assert_eq!(bv1, bv2);
+            assert_eq!(bv1, expected);
         }
 
         #[test]
@@ -718,8 +718,17 @@ mod tests {
             let mut bv1 : BitVector = "1".parse().unwrap();
             bv1.revert();
 
-            let bv2 = "1".parse().unwrap();
-            assert_eq!(bv1, bv2);
+            let expected = "1".parse().unwrap();
+            assert_eq!(bv1, expected);
         }
+
+        // #[test]
+        // fn test_revert_with_two_bit_vectors() {
+        //     let mut bv1 : BitVector = "10".parse().unwrap();
+        //     bv1.revert();
+        // 
+        //     let bv2 = "01".parse().unwrap();
+        //     assert_eq!(bv1, bv2);
+        // }
     }
 }
