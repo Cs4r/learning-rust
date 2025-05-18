@@ -714,7 +714,6 @@ mod tests {
         }
 
         #[test]
-
         fn test_revert_with_one_bit_vector() {
             let mut bv1 : BitVector = "1".parse().unwrap();
             bv1.revert();
