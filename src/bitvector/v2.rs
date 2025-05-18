@@ -29,6 +29,39 @@ impl BitVector {
     fn n_bytes(&self) -> usize {
         n_bytes(self.n_bits())
     }
+
+    fn get(&self, bit_n: usize) -> bool {
+        self.data[bit_n >> 3] & (1 << (bit_n & 7)) != 0
+    }
+
+    fn set(&mut self, bit_n: usize, value: bool) {
+        if value {
+            if !self.get(bit_n) {
+                self.data[bit_n >> 3] = self.data[bit_n >> 3] ^ (1 << (bit_n & 7))
+            }
+        } else {
+            if self.get(bit_n) {
+                self.data[bit_n >> 3] = self.data[bit_n >> 3] ^ (1 << (bit_n & 7));
+            }
+        }
+    }
+
+    fn add_bit(&mut self, value: bool) {
+        if 8 * self.data.len() == self.n_bits {
+            let new_len = if self.data.len() == 0 {
+                1
+            } else {
+                self.data.len() * 2
+            };
+            self.data.resize(new_len, 0);
+        }
+
+        self.n_bits += 1;
+
+        if value {
+            self.set(self.n_bits - 1, true);
+        }
+    }
 }
 
 fn n_bytes(n_bits: usize) -> usize {
