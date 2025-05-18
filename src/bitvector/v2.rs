@@ -109,6 +109,56 @@ mod tests {
         }
     }
 
+    mod set_and_get_behavior {
+        use super::*;
+
+        #[test]
+        fn test_set_and_get_single_bit() {
+            let mut bv = BitVector::with_bits(8);
+
+            for i in 0..8 {
+                assert_eq!(bv.get(i), false, "bit {} should be false initially", i);
+            }
+
+            bv.set(3, true);
+            assert_eq!(bv.get(3), true, "bit 3 should be true after setting to true");
+
+            bv.set(3, false);
+            assert_eq!(bv.get(3), false, "bit 3 should be false after setting to false");
+        }
+
+        #[test]
+        fn test_set_multiple_bits() {
+            let mut bv = BitVector::with_bits(16);
+
+            bv.set(0, true);
+            bv.set(7, true);
+            bv.set(15, true);
+
+            assert!(bv.get(0));
+            assert!(bv.get(7));
+            assert!(bv.get(15));
+
+            assert!(!bv.get(1));
+            assert!(!bv.get(8));
+        }
+
+        #[test]
+        fn test_toggle_bit() {
+            let mut bv = BitVector::with_bits(1);
+            assert_eq!(bv.get(0), false);
+
+            bv.set(0, true);
+            assert_eq!(bv.get(0), true);
+
+            bv.set(0, true);
+            assert_eq!(bv.get(0), true);
+
+            bv.set(0, false);
+            assert_eq!(bv.get(0), false);
+        }
+    }
+
     mod add_bit_behavior {
         use super::*;
 
