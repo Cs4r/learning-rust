@@ -89,6 +89,16 @@ mod tests {
             
             assert_eq!(collected, input);
         }
+        
+            #[test]
+        fn test_from_reader_empty() {
+            let input = "";
+            let cursor = Cursor::new(input.as_bytes());
+
+            let lz_coder = Lz77::from_reader(cursor).expect("Failed to read");
+
+            assert_eq!(lz_coder.vector.len(), 0);
+        }
 
     }
 }
