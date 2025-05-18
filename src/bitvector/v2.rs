@@ -187,7 +187,7 @@ mod tests {
             assert_eq!(bv.get_byte(0), 0b01010101);
             assert_eq!(bv.get_byte(12), 0b00000101);
         }
-        
+
         #[test]
         fn test_add_bit_only_false() {
             let mut bv = BitVector::new();
@@ -196,6 +196,18 @@ mod tests {
             }
             assert_eq!(bv.n_bits(), 16);
             assert_eq!(bv.data, vec![0b00000000, 0b00000000]);
+        }
+
+        #[test]
+        fn test_add_bit_only_true() {
+            let mut bv = BitVector::new();
+
+            for _ in 0..16 {
+                bv.add_bit(true);
+            }
+
+            assert_eq!(bv.n_bits(), 16);
+            assert_eq!(bv.data, vec![0b11111111, 0b11111111]);
         }
     }
 }
