@@ -14,17 +14,10 @@ impl BitVector {
     }
 
     pub fn with_bits(n_bits: usize) -> BitVector {
-        if n_bits == 0 {
-            BitVector {
-                data: vec![],
-                n_bits: 0,
-            }
-        } else {
-            let n_bytes = n_bytes(n_bits);
-            let vec: Vec<u8> = vec![0; n_bytes];
+        let n_bytes = n_bytes(n_bits);
+        let vec: Vec<u8> = vec![0; n_bytes];
 
-            BitVector { data: vec, n_bits }
-        }
+        BitVector { data: vec, n_bits }
     }
 
     pub fn from_value(n: u32, n_bits: usize) -> BitVector {
