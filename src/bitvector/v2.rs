@@ -798,6 +798,15 @@ mod tests {
         }
 
         #[test]
+        fn test_append_empty_vector_to_not_empty_vector() {
+            let mut bv : BitVector = "1111".parse().unwrap();
+            
+            bv.append(BitVector::new());
+            
+            assert_eq!(bv.to_string(), "1111");
+        }
+
+        #[test]
         fn test_append_non_empty_vector_to_not_empty_vector() {
             let mut bv : BitVector = "1111".parse().unwrap();
             let bv2 : BitVector = "0000".parse().unwrap();
