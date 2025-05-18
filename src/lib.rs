@@ -7,3 +7,4 @@ pub mod bitvector;
 pub mod codec;
 pub mod lz_coder;
 pub mod lz77;
+pub mod code_table;
