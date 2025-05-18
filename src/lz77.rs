@@ -46,6 +46,54 @@ impl Lz77 {
     pub fn get_size(&self) -> usize {
         self.vector.len()
     }
+
+    pub fn next(&mut self) -> i32 {
+        self.distance = 0;
+        let len = self.vector.len() as isize;
+        let mut cursor = self.index;
+        let mut search_pos = self.index - 1;
+        let mut match_length: isize = 0;
+
+        while search_pos >= 0 && cursor < len {
+            if self.vector[search_pos as usize] == self.vector[cursor as usize] {
+                // Characters match, extend match
+                cursor += 1;
+                search_pos += 1;
+                match_length += 1;
+                // Update distance: distance = current index - start position of the match in vector
+                self.distance = (self.index - (search_pos - match_length)) as i32;
+
+                // Stop if match is max length or distance too large
+                if match_length == 258 || self.distance > 32768 {
+                    break;
+                }
+            } else if match_length < 3 {
+                // Match too short, reset cursor and move search position one step backward
+                cursor = self.index;
+                search_pos = search_pos - match_length - 1;
+                match_length = 0;
+                self.distance = 0;
+            } else {
+                // Found a match >= 3, but current characters don't match, so stop searching
+                break;
+            }
+        }
+
+        // If a sufficiently long match found with valid distance
+        if match_length >= 3 && self.distance <= 32768 {
+            self.index = cursor;
+            (match_length + 256) as i32 // Encoded length marker
+        } else {
+            // No match found, output literal byte or end marker (256)
+            if self.index < len {
+                let ch = self.vector[self.index as usize] as i32;
+                self.index += 1;
+                ch
+            } else {
+                256
+            }
+        }
+    }
 }
 
 #[cfg(test)]
