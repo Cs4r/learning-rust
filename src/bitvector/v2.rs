@@ -774,4 +774,22 @@ mod tests {
             assert_eq!(bv1, expected);
         }
     }
+    
+    mod append_behavior {
+        
+        use super::*;
+        
+        #[test]
+        fn test_append_empty_vector_to_empty_vector() {
+            let mut bv = BitVector::new();
+            bv.append(BitVector::new());
+            
+            assert_eq!(bv.data, vec![]);
+            assert_eq!(bv.n_bits, 0);
+        }
+        
+        
+        
+        
+    }
 }
