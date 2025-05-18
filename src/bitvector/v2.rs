@@ -774,22 +774,38 @@ mod tests {
             assert_eq!(bv1, expected);
         }
     }
-    
+
     mod append_behavior {
-        
+
         use super::*;
-        
+
         #[test]
         fn test_append_empty_vector_to_empty_vector() {
             let mut bv = BitVector::new();
             bv.append(BitVector::new());
-            
+
             assert_eq!(bv.data, vec![]);
             assert_eq!(bv.n_bits, 0);
         }
-        
-        
-        
-        
+
+        #[test]
+        fn test_append_vector_to_empty_vector() {
+            const VALUE: &'static str = "10101";
+            let mut bv = BitVector::new();
+
+            bv.append(VALUE.parse().unwrap());
+            assert_eq!(bv.to_string(), VALUE);
+        }
+
+        #[test]
+        fn test_append_non_empty_vector_to_not_empty_vector() {
+            let mut bv : BitVector = "1111".parse().unwrap();
+            let bv2 : BitVector = "0000".parse().unwrap();
+
+            bv.append(bv2);
+
+            assert_eq!(bv.to_string(), "11110000");
+        }
+
     }
 }
