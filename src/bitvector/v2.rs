@@ -55,11 +55,11 @@ impl BitVector {
     pub fn set(&mut self, bit_n: usize, value: bool) {
         if value {
             if !self.get(bit_n) {
-                self.data[bit_n >> 3] ^= (1 << (bit_n & 7))
+                self.data[bit_n >> 3] ^= 1 << (bit_n & 7);
             }
         } else {
             if self.get(bit_n) {
-                self.data[bit_n >> 3] ^= (1 << (bit_n & 7));
+                self.data[bit_n >> 3] ^= 1 << (bit_n & 7);
             }
         }
     }
