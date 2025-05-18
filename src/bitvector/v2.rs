@@ -29,7 +29,7 @@ impl BitVector {
     fn n_bytes(&self) -> usize {
         n_bytes(self.n_bits)
     }
-    
+
     fn get_byte(&self, index: usize) -> u8 {
         self.data[index]
     }
@@ -155,7 +155,7 @@ mod tests {
             assert_eq!(bv.get_byte(0), 0b11111111);
         }
 
-          #[test]
+        #[test]
         fn test_add_bit_triggers_resize() {
             let mut bv = BitVector::new();
 
@@ -165,7 +165,6 @@ mod tests {
 
             assert_eq!(bv.n_bytes(), 1);
 
-
             bv.add_bit(true); // 9th bit triggers resize
 
             assert_eq!(bv.n_bits(), 9);
@@ -174,5 +173,19 @@ mod tests {
             assert_eq!(bv.get_byte(1), 0b00000001);
         }
 
+        #[test]
+        fn test_add_bit_multiple_resizes() {
+            let mut bv = BitVector::new();
+
+            for i in 0..100 {
+                bv.add_bit(i % 2 == 0);
+            }
+
+            assert_eq!(bv.n_bits(), 100);
+            assert_eq!(bv.n_bytes(), 13);
+
+            assert_eq!(bv.get_byte(0), 0b01010101);
+            assert_eq!(bv.get_byte(12), 0b00000101);
+        }
     }
 }
