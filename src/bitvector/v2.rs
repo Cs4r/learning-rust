@@ -65,7 +65,7 @@ impl BitVector {
     }
 
     pub fn add_bit(&mut self, value: bool) {
-        if self.is_full() {
+        if 8 * self.data.len() == self.n_bits { // vector is full
             let new_len = if self.data.len() == 0 {
                 1
             } else {
@@ -79,10 +79,6 @@ impl BitVector {
         if value {
             self.set(self.n_bits - 1, true);
         }
-    }
-
-    fn is_full(&mut self) -> bool {
-        8 * self.data.len() == self.n_bits
     }
 
     pub fn from_str(s: &str) -> Result<Self, String> {
