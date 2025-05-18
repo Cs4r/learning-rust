@@ -13,7 +13,7 @@ impl BitVector {
         Self::with_bits(0)
     }
 
-    fn with_bits(n_bits: usize) -> BitVector {
+    pub fn with_bits(n_bits: usize) -> BitVector {
         if n_bits == 0 {
             BitVector {
                 data: vec![],
@@ -27,7 +27,7 @@ impl BitVector {
         }
     }
 
-    fn from_value(n: u32, n_bits: usize) -> BitVector {
+    pub fn from_value(n: u32, n_bits: usize) -> BitVector {
         let mut bit_vector = BitVector::new();
 
         bit_vector.n_bits = 0;
@@ -43,23 +43,23 @@ impl BitVector {
         bit_vector
     }
 
-    fn n_bits(&self) -> usize {
+    pub fn n_bits(&self) -> usize {
         self.n_bits
     }
 
-    fn n_bytes(&self) -> usize {
+    pub fn n_bytes(&self) -> usize {
         n_bytes(self.n_bits)
     }
 
-    fn get_byte(&self, index: usize) -> u8 {
+    pub fn get_byte(&self, index: usize) -> u8 {
         self.data[index]
     }
 
-    fn get(&self, bit_n: usize) -> bool {
+    pub fn get(&self, bit_n: usize) -> bool {
         self.data[bit_n >> 3] & (1 << (bit_n & 7)) != 0
     }
 
-    fn set(&mut self, bit_n: usize, value: bool) {
+    pub fn set(&mut self, bit_n: usize, value: bool) {
         if value {
             if !self.get(bit_n) {
                 self.data[bit_n >> 3] = self.data[bit_n >> 3] ^ (1 << (bit_n & 7))
@@ -71,7 +71,7 @@ impl BitVector {
         }
     }
 
-    fn add_bit(&mut self, value: bool) {
+    pub fn add_bit(&mut self, value: bool) {
         if 8 * self.data.len() == self.n_bits {
             let new_len = if self.data.len() == 0 {
                 1
@@ -624,13 +624,12 @@ mod tests {
             assert_eq!(debug_output, "BitVector()");
         }
 
-
         #[test]
         fn debug_long_bitvector() {
             let mut bv = BitVector::new();
 
             for char in "1100101001110001".chars() {
-                if  char == '1' {
+                if char == '1' {
                     bv.add_bit(true);
                 } else {
                     bv.add_bit(false);
