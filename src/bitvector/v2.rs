@@ -101,6 +101,10 @@ impl BitVector {
 
         Ok(bv)
     }
+
+    pub fn revert(&self) {
+        // nothing
+    }
 }
 
 impl PartialEq for BitVector {
@@ -695,5 +699,17 @@ mod tests {
         }
     }
 
+    mod revert_behavior {
+        use super::*;
 
+        #[test]
+        fn test_revert_empty_vector() {
+            let mut bv1 = BitVector::new();
+            let bv2 = bv1.clone();
+
+            bv1.revert();
+
+            assert_eq!(bv1, bv2);
+        }
+    }
 }
