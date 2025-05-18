@@ -107,7 +107,6 @@ impl PartialEq for BitVector {
 
 impl Display for BitVector {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-
         for i in 0..self.n_bits {
             write!(f, "{}", if self.get(i) { '1' } else { '0' })?;
         }
@@ -119,14 +118,6 @@ impl Display for BitVector {
 impl Debug for BitVector {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "BitVector({})", self)
-    }
-}
-
-impl FromStr for BitVector {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        BitVector::from_str(s)
     }
 }
 
@@ -584,6 +575,48 @@ mod tests {
             }
             let output = format!("{}", bv);
             assert_eq!(output, "101010101100");
+        }
+    }
+
+    mod debug_behavior {
+        use super::*;
+
+        #[test]
+        fn debug_shows_bitvector_with_label() {
+            let mut bv = BitVector::new();
+
+            bv.add_bit(true);
+            bv.add_bit(false);
+            bv.add_bit(true);
+            bv.add_bit(false);
+            bv.add_bit(true);
+
+            let debug_output = format!("{:?}", bv);
+            assert_eq!(debug_output, "BitVector(10101)");
+        }
+
+        #[test]
+        fn debug_empty_bitvector() {
+            let bv = BitVector::new();
+            let debug_output = format!("{:?}", bv);
+            assert_eq!(debug_output, "BitVector()");
+        }
+
+
+        #[test]
+        fn debug_long_bitvector() {
+            let mut bv = BitVector::new();
+
+            for char in "1100101001110001".chars() {
+                if  char == '1' {
+                    bv.add_bit(true);
+                } else {
+                    bv.add_bit(false);
+                }
+            }
+
+            let debug_output = format!("{:?}", bv);
+            assert_eq!(debug_output, "BitVector(1100101001110001)");
         }
     }
 }
