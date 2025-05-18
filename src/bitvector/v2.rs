@@ -103,14 +103,11 @@ impl BitVector {
     }
 
     pub fn revert(&mut self) {
-        let mut x = false;
-        let mut y = false;
-
         for i in 0..(self.n_bits / 2) {
             let j = self.n_bits - 1 - i;
 
-            x = self.get(i);
-            y = self.get(j);
+            let x = self.get(i);
+            let y = self.get(j);
 
             self.set(i, y);
             self.set(j, x);
