@@ -741,5 +741,14 @@ mod tests {
             let expected = "01".parse().unwrap();
             assert_eq!(bv1, expected);
         }
+
+        #[test]
+        fn test_revert_with_one_byte() {
+            let mut bv1: BitVector = "10101010".parse().unwrap();
+            bv1.revert();
+
+            let expected = "01010101".parse().unwrap();
+            assert_eq!(bv1, expected);
+        }
     }
 }
