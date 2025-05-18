@@ -65,7 +65,8 @@ impl BitVector {
     }
 
     pub fn add_bit(&mut self, value: bool) {
-        if 8 * self.data.len() == self.n_bits { // vector is full
+        if 8 * self.data.len() == self.n_bits {
+            // vector is full
             let new_len = if self.data.len() == 0 {
                 1
             } else {
@@ -104,6 +105,20 @@ impl BitVector {
 
             self.set(i, y);
             self.set(j, x);
+        }
+    }
+
+    pub fn append(&mut self, other: BitVector) {
+        if other.n_bits == 0 {
+            return;
+        }
+
+        if self.n_bits == 0 {
+            *self = other;
+        } else {
+            for i in 0..other.n_bits {
+                self.add_bit(other.get(i));
+            }
         }
     }
 }
