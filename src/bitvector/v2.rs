@@ -800,9 +800,9 @@ mod tests {
         #[test]
         fn test_append_empty_vector_to_not_empty_vector() {
             let mut bv : BitVector = "1111".parse().unwrap();
-            
+
             bv.append(BitVector::new());
-            
+
             assert_eq!(bv.to_string(), "1111");
         }
 
@@ -814,6 +814,45 @@ mod tests {
             bv.append(bv2);
 
             assert_eq!(bv.to_string(), "11110000");
+        }
+
+        #[test]
+        fn test_append_multiple_vectors_in_sequence() {
+            let mut bv: BitVector = "1".parse().unwrap();
+            bv.append("01".parse().unwrap());
+            bv.append("10".parse().unwrap());
+
+            assert_eq!(bv.to_string(), "10110");
+        }
+
+        #[test]
+        fn test_append_to_self_with_clone() {
+            let mut bv: BitVector = "101".parse().unwrap();
+            let clone = bv.clone();
+            bv.append(clone);
+
+            assert_eq!(bv.to_string(), "101101");
+        }
+
+        #[test]
+        fn test_append_vectors_with_non_byte_aligned_lengths() {
+            let mut bv: BitVector = "101".parse().unwrap();
+            let bv2: BitVector = "11".parse().unwrap();
+
+            bv.append(bv2);
+            assert_eq!(bv.to_string(), "10111");
+        }
+
+        #[test]
+        fn test_data_allocation_growth() {
+            let mut bv: BitVector = BitVector::new();
+
+            for _ in 0..20 {
+                bv.append("1".parse().unwrap());
+            }
+
+            assert_eq!(bv.n_bits(), 20);
+            assert_eq!(bv.to_string(), "1".repeat(20));
         }
 
     }
