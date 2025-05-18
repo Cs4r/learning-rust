@@ -8,7 +8,7 @@ impl Crc32 {
     }
 
     pub fn get(&mut self) -> u32 {
-        self.0 = self.0 ^ 0xFFFFFFFF;
+        self.0 ^= 0xFFFFFFFF;
         self.0
     }
 
@@ -19,15 +19,11 @@ impl Crc32 {
 }
 
 pub fn crc32(input: &[u8]) -> u32 {
-    let table = crc32_table();
-    let mut crc32: u32 = 0xFFFFFFFF;
+    let mut crc32 = Crc32::new();
 
-    for &byte in input {
-        crc32 = (crc32 >> 8) ^ table[((crc32 ^ byte as u32) & 0xFF) as usize];
-    }
+    input.iter().for_each(|b| crc32.add(*b));
 
-    crc32 = crc32 ^ 0xFFFFFFFF;
-    crc32
+    crc32.get()
 }
 
 static CRC32_TABLE: OnceLock<[u32; 256]> = OnceLock::new();
@@ -70,20 +66,20 @@ mod tests {
             assert_eq!(crc32.0, 0xFFFFFFFF);
         }
     }
-    
+
     mod get_and_add_behavior {
         use crate::crc32::{crc32, Crc32};
 
         #[test]
         fn test_crc32_hello_world() {
             let data = b"hello world";
-            
+
             let mut crc32 = Crc32::new();
-            
+
             for i in data {
                 crc32.add(*i);
             }
-            
+
             assert_eq!(crc32.get(), 0x0D4A1185);
         }
 
@@ -92,7 +88,7 @@ mod tests {
             let data = b"";
 
             let mut crc32 = Crc32::new();
-            
+
             assert_eq!(crc32.get(), 0);
         }
 
@@ -101,11 +97,11 @@ mod tests {
             let data = b"123456789";
 
             let mut crc32 = Crc32::new();
-            
+
             for i in data {
                 crc32.add(*i);
             }
-            
+
             assert_eq!(crc32.get(), 0xCBF43926);
         }
     }
