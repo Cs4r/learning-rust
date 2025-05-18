@@ -1,6 +1,6 @@
 use std::sync::OnceLock;
 
-struct Crc32(u32);
+pub struct Crc32(u32);
 
 impl Crc32 {
     pub fn new() -> Self {
