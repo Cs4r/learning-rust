@@ -65,7 +65,7 @@ mod tests {
         }
     }
     
-    mod get_behavior {
+    mod get_and_add_behavior {
         use crate::crc32::{crc32, Crc32};
 
         #[test]
@@ -88,6 +88,19 @@ mod tests {
             let mut crc32 = Crc32::new();
             
             assert_eq!(crc32.get(), 0);
+        }
+
+        #[test]
+        fn test_crc32_known_value() {
+            let data = b"123456789";
+
+            let mut crc32 = Crc32::new();
+            
+            for i in data {
+                crc32.add(*i);
+            }
+            
+            assert_eq!(crc32.get(), 0xCBF43926);
         }
     }
 
