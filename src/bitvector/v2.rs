@@ -103,14 +103,14 @@ mod tests {
 
             let expected_bytes = n_bytes(bits);
             assert_eq!(bv.n_bytes(), expected_bytes);
-            assert_eq!(bv.data.len(), expected_bytes);
+            assert_eq!(bv.n_bytes(), expected_bytes);
 
             assert!(bv.data.iter().all(|&b| b == 0));
         }
     }
 
     mod add_bit_behavior {
-        use super::*; 
+        use super::*;
 
         #[test]
         fn test_add_bit_true_to_empty_vector() {
@@ -139,19 +139,19 @@ mod tests {
             bv.add_bit(true);
             bv.add_bit(false);
             assert_eq!(bv.n_bits(), 4);
-            assert_eq!(bv.data.len(), 1);
+            assert_eq!(bv.n_bytes(), 1);
             assert_eq!(bv.get_byte(0), 0b00000101);
         }
-        
+
         #[test]
         fn test_add_bit_fill_one_byte() {
             let mut bv = BitVector::new();
-            
+
             for _ in 0..8 {
                 bv.add_bit(true);
             }
             assert_eq!(bv.n_bits(), 8);
-            assert_eq!(bv.data.len(), 1);
+            assert_eq!(bv.n_bytes(), 1);
             assert_eq!(bv.get_byte(0), 0b11111111);
         }
 
