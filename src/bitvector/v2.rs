@@ -143,6 +143,15 @@ impl FromStr for BitVector {
     }
 }
 
+impl Clone for BitVector {
+    fn clone(&self) -> Self {
+        BitVector {
+            data: self.data.clone(),
+            n_bits: self.n_bits,
+        }
+    }
+}
+
 fn n_bytes(n_bits: usize) -> usize {
     (n_bits + 7) >> 3
 }
@@ -685,4 +694,6 @@ mod tests {
             assert_eq!(reconstructed, "11010");
         }
     }
+
+
 }
