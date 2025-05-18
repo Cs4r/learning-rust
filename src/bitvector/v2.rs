@@ -27,7 +27,11 @@ impl BitVector {
     }
 
     fn n_bytes(&self) -> usize {
-        n_bytes(self.n_bits())
+        n_bytes(self.n_bits)
+    }
+    
+    fn get_byte(&self, index: usize) -> u8 {
+        self.data[index]
     }
 
     fn get(&self, bit_n: usize) -> bool {
@@ -115,7 +119,7 @@ mod tests {
             assert_eq!(bv.n_bits(), 1);
             assert_eq!(bv.n_bytes(), 1);
 
-            assert_eq!(bv.data[0], 0b00000001);
+            assert_eq!(bv.get_byte(0), 0b00000001);
         }
 
         #[test]
@@ -124,7 +128,7 @@ mod tests {
             bv.add_bit(false);
             assert_eq!(bv.n_bits(), 1);
             assert_eq!(bv.n_bytes(), 1);
-            assert_eq!(bv.data[0], 0b00000000);
+            assert_eq!(bv.get_byte(0), 0b00000000);
         }
 
         #[test]
@@ -136,7 +140,20 @@ mod tests {
             bv.add_bit(false);
             assert_eq!(bv.n_bits(), 4);
             assert_eq!(bv.data.len(), 1);
-            assert_eq!(bv.data[0], 0b00000101);
+            assert_eq!(bv.get_byte(0), 0b00000101);
         }
+        
+        #[test]
+        fn test_add_bit_fill_one_byte() {
+            let mut bv = BitVector::new();
+            
+            for _ in 0..8 {
+                bv.add_bit(true);
+            }
+            assert_eq!(bv.n_bits(), 8);
+            assert_eq!(bv.data.len(), 1);
+            assert_eq!(bv.get_byte(0), 0b11111111);
+        }
+
     }
 }
