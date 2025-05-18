@@ -155,5 +155,24 @@ mod tests {
             assert_eq!(bv.get_byte(0), 0b11111111);
         }
 
+          #[test]
+        fn test_add_bit_triggers_resize() {
+            let mut bv = BitVector::new();
+
+            for _ in 0..8 {
+                bv.add_bit(false)
+            }
+
+            assert_eq!(bv.n_bytes(), 1);
+
+
+            bv.add_bit(true); // 9th bit triggers resize
+
+            assert_eq!(bv.n_bits(), 9);
+            assert_eq!(bv.n_bytes(), 2);
+            assert_eq!(bv.get_byte(0), 0b00000000);
+            assert_eq!(bv.get_byte(1), 0b00000001);
+        }
+
     }
 }
