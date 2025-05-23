@@ -14,7 +14,7 @@ struct Row {
     range: Range,
 }
 
-struct CodeTable {
+pub struct CodeTable {
     lz_length: [Row; 29],
     lz_distance: [Row; 30],
     hff_length: [BitVector; 288],
