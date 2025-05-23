@@ -21,7 +21,6 @@ struct CodeTable {
     hff_distance: [BitVector; 32],
 }
 
-
 impl CodeTable {
     pub fn new() -> Self {
         // Initialize the LZ77 length table with default values.
@@ -172,7 +171,7 @@ impl CodeTable {
     pub fn get_huffman_distance(&self, d: usize) -> &BitVector {
         &self.hff_distance[d]
     }
-    
+
     pub fn get_lz_length(&self, l: usize) -> (i32, BitVector) {
         let mut i = 0;
         while i < 29 && self.lz_length[i].range.right < l {
@@ -180,19 +179,34 @@ impl CodeTable {
         }
 
         let k = self.lz_length[i].code;
-        
-         let vector = BitVector::from_value(
+
+        let vector = BitVector::from_value(
             (l - self.lz_length[i].range.left) as u32,
-            self.lz_length[i].n_bits
+            self.lz_length[i].n_bits,
         );
-        
+
+        (k, vector)
+    }
+
+    pub fn get_lz_distance(&self, d: usize) -> (i32, BitVector) {
+        let mut i = 0;
+        while i < 30 && self.lz_distance[i].range.right < d {
+            i += 1;
+        }
+
+        let k = self.lz_distance[i].code;
+
+        let vector = BitVector::from_value(
+            (d - self.lz_distance[i].range.left) as u32,
+            self.lz_distance[i].n_bits,
+        );
+
         (k, vector)
     }
 }
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
     #[test]
     fn test_new_does_not_panic() {
