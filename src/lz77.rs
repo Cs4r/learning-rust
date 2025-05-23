@@ -28,7 +28,7 @@ impl Lz77 {
         let mut lz77 = Lz77::new();
 
         for byte_result in reader.bytes() {
-            let byte = byte_result?;
+            let byte = byte_result?; // Manejo de error
             lz77.add(byte);
         }
 

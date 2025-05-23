@@ -164,12 +164,12 @@ impl CodeTable {
         }
     }
 
-    pub fn get_huffman_length(&self, l: usize) -> &BitVector {
-        &self.hff_length[l]
+    pub fn get_huffman_length(&self, l: usize) -> BitVector {
+        self.hff_length[l].clone()
     }
 
-    pub fn get_huffman_distance(&self, d: usize) -> &BitVector {
-        &self.hff_distance[d]
+    pub fn get_huffman_distance(&self, d: usize) -> BitVector {
+        self.hff_distance[d].clone()
     }
 
     pub fn get_lz_length(&self, l: usize) -> (i32, BitVector) {
