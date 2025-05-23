@@ -1,3 +1,4 @@
+use crate::bitvector;
 use crate::bitvector::v2::BitVector;
 
 #[derive(Clone, Copy)]
@@ -170,6 +171,22 @@ impl CodeTable {
 
     pub fn get_huffman_distance(&self, d: usize) -> &BitVector {
         &self.hff_distance[d]
+    }
+    
+    pub fn get_lz_length(&self, l: usize) -> (i32, BitVector) {
+        let mut i = 0;
+        while i < 29 && self.lz_length[i].range.right < l {
+            i += 1;
+        }
+
+        let k = self.lz_length[i].code;
+        
+         let vector = BitVector::from_value(
+            (l - self.lz_length[i].range.left) as u32,
+            self.lz_length[i].n_bits
+        );
+        
+        (k, vector)
     }
 }
 
