@@ -2,7 +2,7 @@ use crate::crc32::Crc32;
 use std::error::Error;
 use std::io::BufRead;
 
-struct Lz77 {
+pub struct Lz77 {
     vector: Vec<u8>,
     index: isize,
     distance: i32,
