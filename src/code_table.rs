@@ -65,12 +65,18 @@ impl CodeTable {
         lz_length[27] = Row {
             code: 284,
             n_bits: 5,
-            range: Range { left: 227, right: 257 },
+            range: Range {
+                left: 227,
+                right: 257,
+            },
         };
         lz_length[28] = Row {
             code: 285,
             n_bits: 0,
-            range: Range { left: 258, right: 258 },
+            range: Range {
+                left: 258,
+                right: 258,
+            },
         };
 
         let mut lz_distance = [Row {
@@ -113,10 +119,12 @@ impl CodeTable {
                 amplitude *= 2;
             }
         }
-        
-        let hff_distance: [BitVector; 32] = std::array::from_fn(|i| BitVector::from_value(i, 5));
+
+        let hff_distance: [BitVector; 32] =
+            std::array::from_fn(|i| BitVector::from_value(i as u32, 5));
 
         let hff_length: [BitVector; 288] = std::array::from_fn(|i| {
+            let i = i as u32;
             if i < 144 {
                 BitVector::from_value(i + 48, 8)
             } else if i < 256 {
