@@ -11,39 +11,28 @@ fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().collect();
 
     if args.len() < 2 {
-        eprintln!("Usage: {} <file_name> [ <output_file_name> ]", args[0]);
+        eprintln!("Usage: {} <input_file> [output_file]", args[0]);
         std::process::exit(1);
     }
 
-    let input_file_name = &args[1];
-    let input_reader = BufReader::new(File::open(input_file_name)?);
+    let input_file = &args[1];
+    let output_file = args.get(2)
+        .map(|s| s.to_owned())
+        .unwrap_or_else(|| format!("{}.gz", input_file));
 
+    let input_reader = BufReader::new(File::open(input_file)?);
     let mut lz_coder = Lz77::from_reader(input_reader)?;
+    let mut output = File::create(output_file)?;
 
-    let mut output_file = File::create(get_output_file_name(&args))?;
-
-    // Gzip
-    write_gzip_header(input_file_name, &mut output_file)?;
-
-    write_gzip_body(&mut lz_coder, &mut output_file, &mut BitVector::new())?;
-
-    write_gzip_tail(&mut lz_coder, &mut output_file)?;
+    write_gzip_header(input_file, &mut output)?;
+    write_gzip_body(&mut lz_coder, &mut output, &mut BitVector::new())?;
+    write_gzip_tail(&mut lz_coder, &mut output)?;
 
     Ok(())
 }
 
-fn get_output_file_name(args: &Vec<String>) -> String {
-    let output_file_name;
-
-    if args.len() == 3 {
-        output_file_name = args[2].to_owned();
-    } else {
-        output_file_name = args[1].to_owned() + ".gz";
-    }
-    output_file_name
-}
-
 fn write_gzip_header(input_file_name: &String, output: &mut File) -> Result<(), Box<dyn Error>> {
+    // Standard gzip header + filename + comment
     let header = [0x1F, 0x8B, 0x08, 0x18, 0x00, 0x00, 0x00, 0x00, 0x04, 0xFF];
     output.write_all(&header)?;
 
