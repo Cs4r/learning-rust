@@ -163,6 +163,10 @@ impl CodeTable {
             hff_distance,
         }
     }
+
+    pub fn get_huffman_length(&self, l: usize) -> &BitVector {
+        &self.hff_length[l]
+    }
 }
 
 #[cfg(test)]
