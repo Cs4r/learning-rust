@@ -3,7 +3,7 @@ use std::fmt::{Debug, Display};
 use std::str::FromStr;
 
 #[derive(Hash, Eq)]
-struct BitVector {
+pub struct BitVector {
     data: Vec<u8>,
     n_bits: usize,
 }
@@ -35,6 +35,7 @@ impl BitVector {
 
         bit_vector
     }
+    
 
     pub fn n_bits(&self) -> usize {
         self.n_bits
