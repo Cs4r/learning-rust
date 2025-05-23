@@ -31,4 +31,8 @@ path = "bin/decode.rs"
 name = "lz77"
 path = "bin/lz77.rs"
 
+[[bin]]
+name = "gzip"
+path = "bin/gzip.rs"
+
 [dependencies]
