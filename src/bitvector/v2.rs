@@ -35,7 +35,7 @@ impl BitVector {
 
         bit_vector
     }
-    
+
 
     pub fn n_bits(&self) -> usize {
         self.n_bits
@@ -109,13 +109,13 @@ impl BitVector {
         }
     }
 
-    pub fn append(&mut self, other: BitVector) {
+    pub fn append(&mut self, other: &BitVector) {
         if other.n_bits == 0 {
             return;
         }
 
         if self.n_bits == 0 {
-            *self = other;
+            *self = other.clone();
         } else {
             for i in 0..other.n_bits {
                 self.add_bit(other.get(i));
@@ -783,7 +783,7 @@ mod tests {
         #[test]
         fn test_append_empty_vector_to_empty_vector() {
             let mut bv = BitVector::new();
-            bv.append(BitVector::new());
+            bv.append(&BitVector::new());
 
             assert_eq!(bv.data, vec![]);
             assert_eq!(bv.n_bits, 0);
@@ -794,7 +794,7 @@ mod tests {
             let mut bv = BitVector::new();
             const VALUE: &str = "10101";
 
-            bv.append(VALUE.parse().unwrap());
+            bv.append(&VALUE.parse().unwrap());
             assert_eq!(bv.to_string(), VALUE);
         }
 
@@ -802,7 +802,7 @@ mod tests {
         fn test_append_empty_vector_to_not_empty_vector() {
             let mut bv : BitVector = "1111".parse().unwrap();
 
-            bv.append(BitVector::new());
+            bv.append(&BitVector::new());
 
             assert_eq!(bv.to_string(), "1111");
         }
@@ -812,7 +812,7 @@ mod tests {
             let mut bv : BitVector = "1111".parse().unwrap();
             let bv2 : BitVector = "0000".parse().unwrap();
 
-            bv.append(bv2);
+            bv.append(&bv2);
 
             assert_eq!(bv.to_string(), "11110000");
         }
@@ -820,8 +820,8 @@ mod tests {
         #[test]
         fn test_append_multiple_vectors_in_sequence() {
             let mut bv: BitVector = "1".parse().unwrap();
-            bv.append("01".parse().unwrap());
-            bv.append("10".parse().unwrap());
+            bv.append(&"01".parse().unwrap());
+            bv.append(&"10".parse().unwrap());
 
             assert_eq!(bv.to_string(), "10110");
         }
@@ -830,7 +830,7 @@ mod tests {
         fn test_append_to_self_with_clone() {
             let mut bv: BitVector = "101".parse().unwrap();
             let clone = bv.clone();
-            bv.append(clone);
+            bv.append(&clone);
 
             assert_eq!(bv.to_string(), "101101");
         }
@@ -840,7 +840,7 @@ mod tests {
             let mut bv: BitVector = "101".parse().unwrap();
             let bv2: BitVector = "11".parse().unwrap();
 
-            bv.append(bv2);
+            bv.append(&bv2);
             assert_eq!(bv.to_string(), "10111");
         }
 
@@ -849,7 +849,7 @@ mod tests {
             let mut bv: BitVector = BitVector::new();
 
             for _ in 0..20 {
-                bv.append("1".parse().unwrap());
+                bv.append(&"1".parse().unwrap());
             }
 
             assert_eq!(bv.n_bits(), 20);
