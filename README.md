@@ -1,5 +1,15 @@
 # 🦀 learning-rust
 
+**learning-rust** is a hands-on collection of small Rust programs focused on understanding core concepts in data representation, integrity, and compression.
+
+This project includes a variety of command-line tools that demonstrate how to:
+
+- Calculate **parity**, **LRC**, and **CRC32** checksums
+- Inspect the **binary structure** of characters
+- Encode and decode text using a **custom Huffman codec**
+- Compress text using **LZ77** and generate **gzip-compatible** files
+
+Whether you're new to Rust or exploring how low-level encoding and compression algorithms work, these tools are designed to be clear, educational, and fun to experiment with.
 
 ## 📦 Binaries
 
