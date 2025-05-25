@@ -167,6 +167,54 @@ Example:
    cargo run --bin lz77 -- < assets/sample.txt > assets/sample_compressed.txt
 ```
 
+
+### 8. gzip
+
+Compresses a text file using a simplified version of the DEFLATE algorithm and outputs a `.gz` file with a valid gzip header and footer.
+
+This tool uses LZ77 for compression and a fixed Huffman coding scheme (as in DEFLATE) to produce gzip-compatible files. The result can be decompressed with common tools like `gunzip` `gzip -d`.
+
+##### 📥 Input format
+- The input file must be a valid UTF-8 text file. 
+- Any text content can be compressed, including Unicode character
+
+##### 📤 Output format
+- The output is a gzip-compatible binary file containing:
+  - A gzip header with:
+    - Method: deflate 
+    - Flags: original filename and comment 
+    - Original filename and a custom comment
+
+- A compressed body using LZ77 + fixed Huffman codes (like DEFLATE)
+
+- A gzip footer with:
+  - CRC32 checksum of the original input 
+  - Original uncompressed size (mod 2³²)
+
+The output can be decompressed using standard gzip tools:
+
+```bash
+   gzip -d assets/constitution.txt.gz
+```
+
+##### ✅ Usage
+
+```bash
+   cargo run --bin gzip -- <input_file> [output_file]
+```
+
+- <input_file> is the path to the text file to compress.
+
+- [output_file] (optional) is the name of the output file. If omitted, it defaults to <input_file>.gz.
+
+Example:
+
+```bash
+   cargo run --bin gzip -- assets/constitution.txt
+```
+
+This will create `assets/constitution.txt.gz`.
+
 ## 🛠 Requirements
 
 - Rust (edition 2024)
