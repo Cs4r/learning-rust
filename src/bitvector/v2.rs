@@ -718,7 +718,6 @@ mod tests {
 
     mod revert_behavior {
         use super::*;
-        use std::hint::assert_unchecked;
 
         #[test]
         fn test_revert_empty_vector() {
