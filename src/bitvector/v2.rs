@@ -30,7 +30,7 @@ impl BitVector {
 
         for _ in 0..n_bits {
             bit_vector.add_bit(n & 1 != 0);
-            n /= 2;
+            n >>= 1;
         }
 
         bit_vector
@@ -98,7 +98,7 @@ impl BitVector {
     }
 
     pub fn revert(&mut self) {
-        for i in 0..(self.n_bits / 2) {
+        for i in 0..(self.n_bits >> 1) {
             let j = self.n_bits - 1 - i;
 
             let x = self.get(i);
