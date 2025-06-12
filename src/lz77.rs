@@ -15,7 +15,7 @@ impl Lz77 {
             vector: vec![],
             index: 0,
             distance: 0,
-            crc: Crc32::new(),
+            crc: Crc32::default(),
         }
     }
 
@@ -109,7 +109,7 @@ mod tests {
             assert!(lz77.vector.is_empty());
             assert_eq!(0, lz77.index);
             assert_eq!(0, lz77.distance);
-            assert!(lz77.crc == Crc32::new());
+            assert!(lz77.crc == Crc32::default());
         }
     }
 

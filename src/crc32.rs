@@ -3,10 +3,6 @@ use std::sync::OnceLock;
 pub struct Crc32(u32);
 
 impl Crc32 {
-    pub fn new() -> Self {
-        Crc32(0xFFFFFFFF)
-    }
-
     pub fn get(&mut self) -> u32 {
         self.0 ^= 0xFFFFFFFF;
         self.0
@@ -18,8 +14,14 @@ impl Crc32 {
     }
 }
 
+impl Default for Crc32 {
+    fn default() -> Self {
+        Crc32(0xFFFFFFFF)
+    }
+}
+
 pub fn crc32(input: &[u8]) -> u32 {
-    let mut crc32 = Crc32::new();
+    let mut crc32 = Crc32::default();
 
     input.iter().for_each(|b| crc32.add(*b));
 
@@ -60,8 +62,8 @@ mod tests {
         use crate::crc32::Crc32;
 
         #[test]
-        fn new_sets_all_bits_to_one() {
-            let crc32 = Crc32::new();
+        fn default_sets_all_bits_to_one() {
+            let crc32 = Crc32::default();
 
             assert_eq!(crc32.0, 0xFFFFFFFF);
         }
@@ -74,7 +76,7 @@ mod tests {
         fn test_crc32_hello_world() {
             let data = b"hello world";
 
-            let mut crc32 = Crc32::new();
+            let mut crc32 = Crc32::default();
 
             for i in data {
                 crc32.add(*i);
@@ -87,7 +89,7 @@ mod tests {
         fn test_crc32_empty() {
             let data = b"";
 
-            let mut crc32 = Crc32::new();
+            let mut crc32 = Crc32::default();
 
             assert_eq!(crc32.get(), 0);
         }
@@ -96,7 +98,7 @@ mod tests {
         fn test_crc32_known_value() {
             let data = b"123456789";
 
-            let mut crc32 = Crc32::new();
+            let mut crc32 = Crc32::default();
 
             for i in data {
                 crc32.add(*i);
