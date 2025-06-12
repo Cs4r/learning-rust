@@ -4,18 +4,14 @@ use std::error::Error;
 use std::io::BufRead;
 use std::rc::Rc;
 
+
+#[derive(Default)]
 pub struct Codec {
     by_byte: HashMap<u8, Rc<BitVector>>,
     by_vector: HashMap<Rc<BitVector>, u8>,
 }
 
 impl Codec {
-    pub fn new() -> Self {
-        Codec {
-            by_byte: HashMap::new(),
-            by_vector: HashMap::new(),
-        }
-    }
 
     pub fn register_code(&mut self, byte: u8, bits: BitVector) {
         let shared = Rc::new(bits);
@@ -45,7 +41,7 @@ impl Codec {
         reader.read_line(&mut first_line)?;
         let n: usize = first_line.trim().parse()?;
 
-        let mut codec = Codec::new();
+        let mut codec = Codec::default();
 
         for _ in 0..n {
             let mut char_buf = [0u8; 1];
@@ -78,8 +74,8 @@ mod tests {
     mod constructor {
         use super::*;
         #[test]
-        fn test_new_creates_empty_codec() {
-            let codec = Codec::new();
+        fn test_default_creates_empty_codec() {
+            let codec = Codec::default();
             assert_eq!(codec.by_byte.len(), 0);
             assert_eq!(codec.by_vector.len(), 0);
         }
@@ -90,7 +86,7 @@ mod tests {
 
         #[test]
         fn test_register_code_stores_mappings() {
-            let mut codec = Codec::new();
+            let mut codec = Codec::default();
 
             let bv1: BitVector = "10".parse().unwrap();
 
@@ -115,7 +111,7 @@ mod tests {
 
         #[test]
         fn test_register_code_overwrites_existing_mapping_for_same_byte() {
-            let mut codec = Codec::new();
+            let mut codec = Codec::default();
 
             let bit_vector_one: BitVector = "1".parse().unwrap();
             let bit_vector_zero: BitVector = "0".parse().unwrap();
@@ -136,14 +132,14 @@ mod tests {
 
         #[test]
         fn returns_false_on_empty_codec() {
-            let empty_codec = Codec::new();
+            let empty_codec = Codec::default();
 
             assert!(!empty_codec.is_byte_encoded(4));
         }
 
         #[test]
         fn returns_true_when_byte_registered() {
-            let mut codec = Codec::new();
+            let mut codec = Codec::default();
 
             let byte = 55;
             codec.register_code(byte, BitVector::default());
@@ -153,7 +149,7 @@ mod tests {
 
         #[test]
         fn returns_false_when_byte_not_registered()  {
-            let mut codec = Codec::new();
+            let mut codec = Codec::default();
 
             let byte = 55;
             codec.register_code(byte, BitVector::default());
@@ -163,7 +159,7 @@ mod tests {
 
         #[test]
         fn returns_true_for_multiple_registered_bytes() {
-            let mut codec = Codec::new();
+            let mut codec = Codec::default();
 
             for byte in 0..10 {
                 let bv: BitVector = if byte % 2 == 0 { "1".parse().unwrap() } else { "0".parse().unwrap() };
@@ -177,7 +173,7 @@ mod tests {
 
         #[test]
         fn returns_false_for_unregistered_byte_among_registered_ones() {
-            let mut codec = Codec::new();
+            let mut codec = Codec::default();
 
             for byte in 0..10 {
                 let bv: BitVector = "1".parse().unwrap();
@@ -196,7 +192,7 @@ mod tests {
 
         #[test]
         fn returns_false_when_map_is_empty() {
-            let codec = Codec::new();
+            let codec = Codec::default();
 
             let bv: BitVector = "1".parse().unwrap();
 
@@ -205,7 +201,7 @@ mod tests {
 
         #[test]
         fn returns_true_after_registering_bitvector() {
-            let mut codec = Codec::new();
+            let mut codec = Codec::default();
             let bv: BitVector = "101".parse().unwrap();
 
             codec.register_code(10, bv.clone());
@@ -215,7 +211,7 @@ mod tests {
 
         #[test]
         fn returns_false_for_unregistered_bitvector() {
-            let codec = Codec::new();
+            let codec = Codec::default();
             let bv: BitVector = "101".parse().unwrap();
 
             assert!(!codec.is_bitvector_encoded(&bv));
@@ -223,7 +219,7 @@ mod tests {
 
         #[test]
         fn returns_true_for_multiple_registered_bitvectors() {
-            let mut codec = Codec::new();
+            let mut codec = Codec::default();
 
             let bit_strings = ["1", "10", "101", "111"];
             for (i, bits) in bit_strings.iter().enumerate() {
@@ -239,7 +235,7 @@ mod tests {
 
         #[test]
         fn returns_true_for_different_instances_with_same_bits() {
-            let mut codec = Codec::new();
+            let mut codec = Codec::default();
 
             let bv1: BitVector = "101".parse().unwrap();
             let bv2: BitVector = "101".parse().unwrap();
@@ -255,7 +251,7 @@ mod tests {
 
         #[test]
         fn returns_registered_byte_for_bitvector() {
-            let mut codec = Codec::new();
+            let mut codec = Codec::default();
             let bv: BitVector = "101".parse().unwrap();
             let byte = 42;
 
@@ -267,7 +263,7 @@ mod tests {
         #[test]
         #[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
         fn panics_if_bitvector_not_registered() {
-            let codec = Codec::new();
+            let codec = Codec::default();
             let bv: BitVector = "101".parse().unwrap();
 
             codec.get_byte(&bv);
@@ -275,7 +271,7 @@ mod tests {
 
         #[test]
         fn returns_correct_byte_for_multiplne_registered_bitvectors() {
-            let mut codec = Codec::new();
+            let mut codec = Codec::default();
 
             let pairs = [("1", 1), ("10", 2), ("101", 5), ("111", 7)];
 
@@ -296,7 +292,7 @@ mod tests {
 
         #[test]
         fn returns_correct_bitvector_after_registering() {
-            let mut codec = Codec::new();
+            let mut codec = Codec::default();
             let bv: BitVector = "101".parse().unwrap();
 
             codec.register_code(10, bv.clone());
@@ -308,7 +304,7 @@ mod tests {
         #[test]
         #[should_panic(expected = "called `Option::unwrap()` on a `None` value")]
         fn panics_when_byte_not_registered() {
-            let codec = Codec::new();
+            let codec = Codec::default();
             // No registration of byte 42
 
             codec.get_bitvector(42); // Should panic because 42 not registered
@@ -316,7 +312,7 @@ mod tests {
 
         #[test]
         fn works_with_multiple_registered_bitvectors() {
-            let mut codec = Codec::new();
+            let mut codec = Codec::default();
 
             let pairs = [
                 (1, "0"),
