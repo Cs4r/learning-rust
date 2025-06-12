@@ -146,7 +146,7 @@ mod tests {
             let mut codec = Codec::new();
 
             let byte = 55;
-            codec.register_code(byte, BitVector::new());
+            codec.register_code(byte, BitVector::default());
 
             assert!(codec.is_byte_encoded(byte));
         }
@@ -156,7 +156,7 @@ mod tests {
             let mut codec = Codec::new();
 
             let byte = 55;
-            codec.register_code(byte, BitVector::new());
+            codec.register_code(byte, BitVector::default());
 
             assert!(!codec.is_byte_encoded(byte + 1));
         }

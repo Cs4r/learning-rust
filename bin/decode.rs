@@ -16,7 +16,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let codec = Codec::from_reader(codec_file)?;
 
     let input_file = BufReader::new(File::open(&args[2])?);
-    let mut bit_vector = BitVector::new();
+    let mut bit_vector = BitVector::default();
 
     for byte_result in input_file.bytes() {
         let byte = byte_result?;
