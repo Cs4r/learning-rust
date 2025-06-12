@@ -2,16 +2,13 @@ use std::fmt;
 use std::fmt::{Debug, Display};
 use std::str::FromStr;
 
-#[derive(Hash, Eq)]
+#[derive(Hash, Eq, Default)]
 pub struct BitVector {
     data: Vec<u8>,
     n_bits: usize,
 }
 
 impl BitVector {
-    pub fn new() -> BitVector {
-        Self::with_bits(0)
-    }
 
     pub fn with_bits(n_bits: usize) -> BitVector {
         let n_bytes = n_bytes(n_bits);
@@ -21,7 +18,7 @@ impl BitVector {
     }
 
     pub fn from_value(n: u32, n_bits: usize) -> BitVector {
-        let mut bit_vector = BitVector::new();
+        let mut bit_vector = BitVector::default();
 
         bit_vector.n_bits = 0;
         bit_vector.data.resize(n_bytes(n_bits), 0);
@@ -84,7 +81,7 @@ impl BitVector {
     }
 
     pub fn from_str(s: &str) -> Result<Self, String> {
-        let mut bv = BitVector::new();
+        let mut bv = BitVector::default();
 
         for (i, c) in s.chars().enumerate() {
             match c {
@@ -186,7 +183,7 @@ mod tests {
 
         #[test]
         fn test_new_creates_empty_vector() {
-            let bv = BitVector::new();
+            let bv = BitVector::default();
             assert_eq!(bv.n_bits(), 0);
             assert_eq!(bv.n_bytes(), 0);
             assert!(bv.data.is_empty());
@@ -277,7 +274,7 @@ mod tests {
 
         #[test]
         fn test_add_bit_true_to_empty_vector() {
-            let mut bv = BitVector::new();
+            let mut bv = BitVector::default();
             bv.add_bit(true);
             assert_eq!(bv.n_bits(), 1);
             assert_eq!(bv.n_bytes(), 1);
@@ -287,7 +284,7 @@ mod tests {
 
         #[test]
         fn test_add_bit_false_to_empty_vector() {
-            let mut bv = BitVector::new();
+            let mut bv = BitVector::default();
             bv.add_bit(false);
             assert_eq!(bv.n_bits(), 1);
             assert_eq!(bv.n_bytes(), 1);
@@ -296,7 +293,7 @@ mod tests {
 
         #[test]
         fn test_add_bit_alternating_bits() {
-            let mut bv = BitVector::new();
+            let mut bv = BitVector::default();
             bv.add_bit(true);
             bv.add_bit(false);
             bv.add_bit(true);
@@ -308,7 +305,7 @@ mod tests {
 
         #[test]
         fn test_add_bit_fill_one_byte() {
-            let mut bv = BitVector::new();
+            let mut bv = BitVector::default();
 
             for _ in 0..8 {
                 bv.add_bit(true);
@@ -320,7 +317,7 @@ mod tests {
 
         #[test]
         fn test_add_bit_triggers_resize() {
-            let mut bv = BitVector::new();
+            let mut bv = BitVector::default();
 
             for _ in 0..8 {
                 bv.add_bit(false)
@@ -338,7 +335,7 @@ mod tests {
 
         #[test]
         fn test_add_bit_multiple_resizes() {
-            let mut bv = BitVector::new();
+            let mut bv = BitVector::default();
 
             for i in 0..100 {
                 bv.add_bit(i % 2 == 0);
@@ -353,7 +350,7 @@ mod tests {
 
         #[test]
         fn test_add_bit_only_false() {
-            let mut bv = BitVector::new();
+            let mut bv = BitVector::default();
             for _ in 0..16 {
                 bv.add_bit(false);
             }
@@ -363,7 +360,7 @@ mod tests {
 
         #[test]
         fn test_add_bit_only_true() {
-            let mut bv = BitVector::new();
+            let mut bv = BitVector::default();
 
             for _ in 0..16 {
                 bv.add_bit(true);
@@ -428,8 +425,8 @@ mod tests {
 
         #[test]
         fn eq_same_empty_vectors() {
-            let bv1 = BitVector::new();
-            let bv2 = BitVector::new();
+            let bv1 = BitVector::default();
+            let bv2 = BitVector::default();
             assert_eq!(bv1, bv2);
         }
 
@@ -520,8 +517,8 @@ mod tests {
 
         #[test]
         fn test_equal_vectors_have_same_hash() {
-            let mut a = BitVector::new();
-            let mut b = BitVector::new();
+            let mut a = BitVector::default();
+            let mut b = BitVector::default();
 
             a.add_bit(true);
             a.add_bit(false);
@@ -537,8 +534,8 @@ mod tests {
 
         #[test]
         fn test_different_vectors_have_different_hashes() {
-            let mut a = BitVector::new();
-            let mut b = BitVector::new();
+            let mut a = BitVector::default();
+            let mut b = BitVector::default();
 
             a.add_bit(true);
             a.add_bit(false);
@@ -558,14 +555,14 @@ mod tests {
 
         #[test]
         fn test_display_empty() {
-            let bv = BitVector::new();
+            let bv = BitVector::default();
             let output = format!("{}", bv);
             assert_eq!(output, "");
         }
 
         #[test]
         fn test_display_single_bit_true() {
-            let mut bv = BitVector::new();
+            let mut bv = BitVector::default();
             bv.add_bit(true);
             let output = format!("{}", bv);
             assert_eq!(output, "1");
@@ -573,7 +570,7 @@ mod tests {
 
         #[test]
         fn test_display_single_bit_false() {
-            let mut bv = BitVector::new();
+            let mut bv = BitVector::default();
             bv.add_bit(false);
             let output = format!("{}", bv);
             assert_eq!(output, "0");
@@ -581,7 +578,7 @@ mod tests {
 
         #[test]
         fn test_display_multiple_bits() {
-            let mut bv = BitVector::new();
+            let mut bv = BitVector::default();
             bv.add_bit(true);
             bv.add_bit(false);
             bv.add_bit(true);
@@ -595,7 +592,7 @@ mod tests {
 
         #[test]
         fn test_display_full_byte() {
-            let mut bv = BitVector::new();
+            let mut bv = BitVector::default();
             for _ in 0..8 {
                 bv.add_bit(true);
             }
@@ -605,7 +602,7 @@ mod tests {
 
         #[test]
         fn test_display_partial_byte() {
-            let mut bv = BitVector::new();
+            let mut bv = BitVector::default();
             bv.add_bit(true);
             bv.add_bit(false);
             bv.add_bit(false);
@@ -616,7 +613,7 @@ mod tests {
 
         #[test]
         fn test_display_multiple_bytes() {
-            let mut bv = BitVector::new();
+            let mut bv = BitVector::default();
             // 12 bits: 10101010 1100 (last 4 bits)
             let bits = [
                 true, false, true, false, true, false, true, false, // 8 bits = 0b10101010
@@ -635,7 +632,7 @@ mod tests {
 
         #[test]
         fn debug_shows_bitvector_with_label() {
-            let mut bv = BitVector::new();
+            let mut bv = BitVector::default();
 
             bv.add_bit(true);
             bv.add_bit(false);
@@ -649,14 +646,14 @@ mod tests {
 
         #[test]
         fn debug_empty_bitvector() {
-            let bv = BitVector::new();
+            let bv = BitVector::default();
             let debug_output = format!("{:?}", bv);
             assert_eq!(debug_output, "BitVector()");
         }
 
         #[test]
         fn debug_long_bitvector() {
-            let mut bv = BitVector::new();
+            let mut bv = BitVector::default();
 
             for char in "1100101001110001".chars() {
                 if char == '1' {
@@ -721,7 +718,7 @@ mod tests {
 
         #[test]
         fn test_revert_empty_vector() {
-            let mut bv1 = BitVector::new();
+            let mut bv1 = BitVector::default();
             let expected = bv1.clone();
 
             bv1.revert();
@@ -781,8 +778,8 @@ mod tests {
 
         #[test]
         fn test_append_empty_vector_to_empty_vector() {
-            let mut bv = BitVector::new();
-            bv.append(&BitVector::new());
+            let mut bv = BitVector::default();
+            bv.append(&BitVector::default());
 
             assert_eq!(bv.data, vec![]);
             assert_eq!(bv.n_bits, 0);
@@ -790,7 +787,7 @@ mod tests {
 
         #[test]
         fn test_append_vector_to_empty_vector() {
-            let mut bv = BitVector::new();
+            let mut bv = BitVector::default();
             const VALUE: &str = "10101";
 
             bv.append(&VALUE.parse().unwrap());
@@ -801,7 +798,7 @@ mod tests {
         fn test_append_empty_vector_to_not_empty_vector() {
             let mut bv : BitVector = "1111".parse().unwrap();
 
-            bv.append(&BitVector::new());
+            bv.append(&BitVector::default());
 
             assert_eq!(bv.to_string(), "1111");
         }
@@ -845,7 +842,7 @@ mod tests {
 
         #[test]
         fn test_data_allocation_growth() {
-            let mut bv: BitVector = BitVector::new();
+            let mut bv: BitVector = BitVector::default();
 
             for _ in 0..20 {
                 bv.append(&"1".parse().unwrap());

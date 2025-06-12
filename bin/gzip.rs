@@ -25,7 +25,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut output = File::create(output_file)?;
 
     write_gzip_header(input_file, &mut output)?;
-    write_gzip_body(&mut lz_coder, &mut output, &mut BitVector::new())?;
+    write_gzip_body(&mut lz_coder, &mut output, &mut BitVector::default())?;
     write_gzip_tail(&mut lz_coder, &mut output)?;
 
     Ok(())
