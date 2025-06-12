@@ -182,7 +182,7 @@ mod tests {
         use super::*;
 
         #[test]
-        fn test_new_creates_empty_vector() {
+        fn test_default_creates_empty_vector() {
             let bv = BitVector::default();
             assert_eq!(bv.n_bits(), 0);
             assert_eq!(bv.n_bytes(), 0);
