@@ -1,6 +1,8 @@
 use std::error::Error;
 use std::io::BufRead;
 
+
+#[derive(Default)]
 pub struct LzCoder {
     vector: Vec<char>,
     index: isize,
@@ -8,16 +10,9 @@ pub struct LzCoder {
 }
 
 impl LzCoder {
-    pub fn new() -> LzCoder {
-        LzCoder {
-            vector: Vec::new(),
-            index: 0,
-            distance: 0,
-        }
-    }
-
+    
     pub fn from_reader<R: BufRead>(mut reader: R) -> Result<Self, Box<dyn Error>> {
-        let mut lz_coder = LzCoder::new();
+        let mut lz_coder = LzCoder::default();
         let mut buffer = Vec::new();
 
         reader.read_to_end(&mut buffer)?;
@@ -90,8 +85,8 @@ mod tests {
     mod constructor {
         use super::*;
         #[test]
-        fn test_new_creates_empty_coder() {
-            let coder = LzCoder::new();
+        fn test_default_creates_empty_coder() {
+            let coder = LzCoder::default();
             assert_eq!(coder.vector.len(), 0);
             assert_eq!(coder.index, 0);
             assert_eq!(coder.distance, 0);
