@@ -2,6 +2,8 @@ use crate::crc32::Crc32;
 use std::error::Error;
 use std::io::BufRead;
 
+
+#[derive(Default)]
 pub struct Lz77 {
     vector: Vec<u8>,
     index: isize,
@@ -10,22 +12,14 @@ pub struct Lz77 {
 }
 
 impl Lz77 {
-    pub fn new() -> Lz77 {
-        Lz77 {
-            vector: vec![],
-            index: 0,
-            distance: 0,
-            crc: Crc32::default(),
-        }
-    }
-
+    
     pub fn add(&mut self, byte: u8) {
         self.vector.push(byte);
         self.crc.add(byte);
     }
 
     pub fn from_reader<R: BufRead>(mut reader: R) -> Result<Self, Box<dyn Error>> {
-        let mut lz77 = Lz77::new();
+        let mut lz77 = Lz77::default();
 
         for byte_result in reader.bytes() {
             let byte = byte_result?; // Manejo de error
@@ -103,8 +97,8 @@ mod tests {
         use super::*;
 
         #[test]
-        fn test_new() {
-            let lz77 = Lz77::new();
+        fn test_default() {
+            let lz77 = Lz77::default();
 
             assert!(lz77.vector.is_empty());
             assert_eq!(0, lz77.index);
@@ -118,7 +112,7 @@ mod tests {
 
         #[test]
         fn test_add() {
-            let mut lz77 = Lz77::new();
+            let mut lz77 = Lz77::default();
             lz77.add(128);
 
             assert_eq!(lz77.vector.len(), 1);
