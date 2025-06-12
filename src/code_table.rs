@@ -1,4 +1,3 @@
-use crate::bitvector;
 use crate::bitvector::v2::BitVector;
 
 #[derive(Clone, Copy)]
@@ -22,7 +21,50 @@ pub struct CodeTable {
 }
 
 impl CodeTable {
-    pub fn new() -> Self {
+
+    pub fn get_huffman_length(&self, l: usize) -> BitVector {
+        self.hff_length[l].clone()
+    }
+
+    pub fn get_huffman_distance(&self, d: usize) -> BitVector {
+        self.hff_distance[d].clone()
+    }
+
+    pub fn get_lz_length(&self, l: usize) -> (i32, BitVector) {
+        let mut i = 0;
+        while i < 29 && self.lz_length[i].range.right < l {
+            i += 1;
+        }
+
+        let k = self.lz_length[i].code;
+
+        let vector = BitVector::from_value(
+            (l - self.lz_length[i].range.left) as u32,
+            self.lz_length[i].n_bits,
+        );
+
+        (k, vector)
+    }
+
+    pub fn get_lz_distance(&self, d: usize) -> (i32, BitVector) {
+        let mut i = 0;
+        while i < 30 && self.lz_distance[i].range.right < d {
+            i += 1;
+        }
+
+        let k = self.lz_distance[i].code;
+
+        let vector = BitVector::from_value(
+            (d - self.lz_distance[i].range.left) as u32,
+            self.lz_distance[i].n_bits,
+        );
+
+        (k, vector)
+    }
+}
+
+impl Default for CodeTable {
+    fn default() -> Self {
         // Initialize the LZ77 length table with default values.
         let mut lz_length = [Row {
             code: 0,
@@ -163,53 +205,13 @@ impl CodeTable {
             hff_distance,
         }
     }
-
-    pub fn get_huffman_length(&self, l: usize) -> BitVector {
-        self.hff_length[l].clone()
-    }
-
-    pub fn get_huffman_distance(&self, d: usize) -> BitVector {
-        self.hff_distance[d].clone()
-    }
-
-    pub fn get_lz_length(&self, l: usize) -> (i32, BitVector) {
-        let mut i = 0;
-        while i < 29 && self.lz_length[i].range.right < l {
-            i += 1;
-        }
-
-        let k = self.lz_length[i].code;
-
-        let vector = BitVector::from_value(
-            (l - self.lz_length[i].range.left) as u32,
-            self.lz_length[i].n_bits,
-        );
-
-        (k, vector)
-    }
-
-    pub fn get_lz_distance(&self, d: usize) -> (i32, BitVector) {
-        let mut i = 0;
-        while i < 30 && self.lz_distance[i].range.right < d {
-            i += 1;
-        }
-
-        let k = self.lz_distance[i].code;
-
-        let vector = BitVector::from_value(
-            (d - self.lz_distance[i].range.left) as u32,
-            self.lz_distance[i].n_bits,
-        );
-
-        (k, vector)
-    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     #[test]
-    fn test_new_does_not_panic() {
-        CodeTable::new();
+    fn test_default_does_not_panic() {
+        CodeTable::default();
     }
 }

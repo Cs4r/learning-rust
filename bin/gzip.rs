@@ -75,7 +75,7 @@ fn deflate(lz_coder: &mut Lz77, data: &mut BitVector) {
     data.add_bit(true);
     data.add_bit(false);
 
-    let table = CodeTable::new();
+    let table = CodeTable::default();
     let mut next_code = lz_coder.next();
     let mut code;
 
